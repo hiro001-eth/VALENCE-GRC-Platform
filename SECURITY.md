@@ -11,7 +11,7 @@
 
 **Do not** open public GitHub issues for security vulnerabilities.
 
-Email: **security@valence-grc.example** (replace with your security alias before external launch)
+Email: **katuwalmanjil609@gmail.com** (replace with your security alias before external launch)
 
 Include:
 - Affected component (API, frontend, auth, tenancy)
