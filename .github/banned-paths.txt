@@ -1,0 +1,24 @@
+# Banned from public repository — see docs/adr/0008-repository-publication-boundaries.md
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*demo*.log
+demo_record.log
+advance_demo_record.log
+.demo_video_tmp/
+.advance_demo_tmp/
+docs/PRODUCT_ROADMAP.md
+docs/LAUNCH_READINESS.md
+annotated_file_structure.md
+research_synthesis_report.md
+ADR.md
+.env
+.env.local
+.env.production
+data/demo_credentials.json
+*.db
+valence.db
+.valence-api.pid
+.coverage

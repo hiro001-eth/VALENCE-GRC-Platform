@@ -1,0 +1,61 @@
+# Advanced MNC Enterprise Metric Definitions
+# Strictly typed mapped to grc_dashboard.models.metric.MetricDefinition
+metrics:
+  - metric_id: "KRI-MTTD-001"
+    metric_name: "Mean Time to Detect (MTTD) Critical Threats"
+    metric_type: "KRI"
+    formula: "avg(first_action_time - creation_time)"
+    data_source: "Elastic:soc-alerts-*"
+    unit: "hours"
+    frequency: "hourly"
+    business_owner: "CISO"
+    threshold_config_id: "THRESH-MTTD-V1"
+    regulatory_mappings:
+      - "DORA_ICT_Risk"
+      - "NIS2_Art21"
+      - "SEC_8K"
+    fair_loss_magnitude_usd: 150000.0  # $150k loss exposure per hour of undetected critical incident
+    fair_threat_event_frequency: 4.5    # 4.5 critical incidents expected annually
+
+  - metric_id: "KPI-MTTR-002"
+    metric_name: "Mean Time to Resolve (MTTR) Ransomware Variants"
+    metric_type: "KPI"
+    formula: "avg(closure_time - creation_time)"
+    data_source: "Splunk:incident_index"
+    unit: "hours"
+    frequency: "daily"
+    business_owner: "Director of SecOps"
+    threshold_config_id: "THRESH-MTTR-V2"
+    regulatory_mappings:
+      - "DORA_Incident_Reporting"
+      - "SEC_8K"
+    fair_loss_magnitude_usd: 2000000.0 # $2M loss exposure per hour of ransomware downtime
+    fair_threat_event_frequency: 0.8    # 0.8 severe ransomware outbreaks annually
+
+  - metric_id: "KRI-FPR-003"
+    metric_name: "SOC Alert False Positive Rate"
+    metric_type: "KRI"
+    formula: "fp_count / (tp_count + fp_count)"
+    data_source: "Elastic:soc-alerts-*"
+    unit: "percent"
+    frequency: "weekly"
+    business_owner: "Detection Engineering"
+    threshold_config_id: "THRESH-FPR-V1"
+    regulatory_mappings:
+      - "ISO27001_A.16.1.2"
+    fair_loss_magnitude_usd: 5000.0     # $5k wasted analyst labor per percentage point
+    fair_threat_event_frequency: 365.0  # Evaluated daily
+
+  - metric_id: "KPI-COVERAGE-004"
+    metric_name: "MITRE ATT&CK Tactic Coverage Drop"
+    metric_type: "KPI"
+    formula: "gap_count / total_techniques"
+    data_source: "Taxii:EnterpriseMatrix"
+    unit: "count"
+    frequency: "weekly"
+    business_owner: "Threat Intel"
+    threshold_config_id: "THRESH-COV-V1"
+    regulatory_mappings:
+      - "NIS2_Art21"
+    fair_loss_magnitude_usd: 50000.0
+    fair_threat_event_frequency: 12.0

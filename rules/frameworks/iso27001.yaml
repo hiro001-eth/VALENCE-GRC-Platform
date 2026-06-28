@@ -1,0 +1,472 @@
+framework_name: ISO27001
+full_name: ISO/IEC 27001:2022 Information Security Management — Annex A
+version: '2022'
+controls:
+- id: ISO-A.5.1
+  title: Policies for information security
+  description: Information security policy and topic-specific policies.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.2
+  title: Information security roles and responsibilities
+  description: Define and allocate information security responsibilities.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.3
+  title: Segregation of duties
+  description: Conflicting duties segregated to reduce misuse.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.4
+  title: Management responsibilities
+  description: Management requires personnel to apply security.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.5
+  title: Contact with authorities
+  description: Maintain contacts with relevant authorities.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.5.6
+  title: Contact with special interest groups
+  description: Maintain contacts with security forums.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.7
+  title: Threat intelligence
+  description: Receive and analyze threat intelligence.
+  metric_ids:
+  - KRI-CVE-001
+  - KPI-FPR-001
+- id: ISO-A.5.8
+  title: Information security in project management
+  description: Address security in project management.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.9
+  title: Inventory of information and assets
+  description: Inventory of information and associated assets.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.5.10
+  title: Acceptable use of information
+  description: Rules for acceptable use identified and documented.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.11
+  title: Return of assets
+  description: Personnel return organizational assets on change/termination.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.12
+  title: Classification of information
+  description: Information classified according to needs.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.13
+  title: Labelling of information
+  description: Appropriate procedures for labelling.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.14
+  title: Information transfer
+  description: Rules and procedures for information transfer.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.15
+  title: Access control
+  description: Rules to control physical and logical access.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.16
+  title: Identity management
+  description: Manage full lifecycle of identities.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.17
+  title: Authentication information
+  description: Manage authentication information securely.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.18
+  title: Access rights
+  description: Provision, review, modify and remove access rights.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.19
+  title: Information security in supplier relationships
+  description: Processes for supplier security.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.20
+  title: Addressing security in supplier agreements
+  description: Establish and agree security requirements.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.21
+  title: Managing ICT supply chain security
+  description: Manage ICT supply chain risks.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.22
+  title: Monitoring and review of supplier services
+  description: Monitor and review supplier services.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.5.23
+  title: Information security for cloud services
+  description: Acquire, use, manage and exit cloud services securely.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.5.24
+  title: Information security incident management planning
+  description: Plan and prepare for incident management.
+  metric_ids:
+  - KRI-MTTD-001
+  - KRI-MTTR-001
+- id: ISO-A.5.25
+  title: Assessment and decision on security events
+  description: Assess and decide on information security events.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.5.26
+  title: Response to information security incidents
+  description: Respond to incidents per documented procedures.
+  metric_ids:
+  - KRI-MTTR-001
+- id: ISO-A.5.27
+  title: Learning from information security incidents
+  description: Knowledge from incidents used to strengthen controls.
+  metric_ids:
+  - KRI-MTTR-001
+- id: ISO-A.5.28
+  title: Collection of evidence
+  description: Establish procedures for evidence identification and handling.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.5.29
+  title: Information security during disruption
+  description: Protect information during disruption.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.5.30
+  title: ICT readiness for business continuity
+  description: ICT readiness planned and implemented.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.5.31
+  title: Legal and regulatory requirements
+  description: Identify and comply with legal requirements.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.5.32
+  title: Intellectual property rights
+  description: Implement procedures to protect IP rights.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.33
+  title: Protection of records
+  description: Records protected from loss and unauthorized access.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.34
+  title: Privacy and protection of PII
+  description: Protect PII per applicable legislation.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.5.35
+  title: Independent review of information security
+  description: Review approach independently at planned intervals.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.5.36
+  title: Compliance with policies and standards
+  description: Review compliance with security policies.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.5.37
+  title: Documented operating procedures
+  description: Operating procedures documented and available.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.1
+  title: Screening
+  description: Background verification checks on candidates.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.2
+  title: Terms and conditions of employment
+  description: Employment contracts state security responsibilities.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.3
+  title: Information security awareness and training
+  description: Personnel receive appropriate awareness and training.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.4
+  title: Disciplinary process
+  description: Formal disciplinary process for security violations.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.5
+  title: Responsibilities after termination
+  description: Security responsibilities remain valid after termination.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.6
+  title: Confidentiality or non-disclosure agreements
+  description: NDAs identified and enforced.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.6.7
+  title: Remote working
+  description: Security measures for remote working.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.6.8
+  title: Information security event reporting
+  description: Mechanism for reporting security events.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.7.1
+  title: Physical security perimeters
+  description: Security perimeters to protect information.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.2
+  title: Physical entry
+  description: Secure areas protected by entry controls.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.3
+  title: Securing offices, rooms and facilities
+  description: Physical security for offices and facilities.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.4
+  title: Physical security monitoring
+  description: Premises continuously monitored.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.7.5
+  title: Protecting against physical threats
+  description: Protection against natural and environmental threats.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.6
+  title: Working in secure areas
+  description: Procedures for working in secure areas.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.7
+  title: Clear desk and clear screen
+  description: Clear desk and clear screen rules.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.7.8
+  title: Equipment siting and protection
+  description: Equipment sited and protected.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.9
+  title: Security of assets off-premises
+  description: Off-site assets protected.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.10
+  title: Storage media
+  description: Storage media managed through lifecycle.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.7.11
+  title: Supporting utilities
+  description: Information processing facilities protected from utility failures.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.7.12
+  title: Cabling security
+  description: Cables carrying power or data protected.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.7.13
+  title: Equipment maintenance
+  description: Equipment maintained correctly.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.7.14
+  title: Secure disposal or re-use of equipment
+  description: Items securely disposed or sanitized.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.1
+  title: User endpoint devices
+  description: Information on endpoint devices protected.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.8.2
+  title: Privileged access rights
+  description: Restrict and manage privileged access.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.8.3
+  title: Information access restriction
+  description: Access to information restricted per policy.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.8.4
+  title: Access to source code
+  description: Read and write access to source code managed.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.5
+  title: Secure authentication
+  description: Secure authentication technologies and procedures.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.8.6
+  title: Capacity management
+  description: Use of resources monitored and adjusted.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.8.7
+  title: Protection against malware
+  description: Protection against malware implemented.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.8
+  title: Management of technical vulnerabilities
+  description: Identify and remediate vulnerabilities.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.9
+  title: Configuration management
+  description: Configurations established and monitored.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.10
+  title: Information deletion
+  description: Information deleted when no longer required.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.11
+  title: Data masking
+  description: Data masked per policy and legislation.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.12
+  title: Data leakage prevention
+  description: DLP measures applied to systems and networks.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.13
+  title: Information backup
+  description: Backup copies maintained and tested.
+  metric_ids:
+  - KRI-MTTR-001
+- id: ISO-A.8.14
+  title: Redundancy of information processing facilities
+  description: Processing facilities implemented with redundancy.
+  metric_ids:
+  - KRI-MTTD-001
+- id: ISO-A.8.15
+  title: Logging
+  description: Logs produced, stored, protected and analyzed.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.8.16
+  title: Monitoring activities
+  description: Networks and systems monitored for anomalies.
+  metric_ids:
+  - KPI-FPR-001
+  - KRI-MTTD-001
+- id: ISO-A.8.17
+  title: Clock synchronization
+  description: Clocks synchronized to approved time sources.
+  metric_ids:
+  - KPI-FPR-001
+- id: ISO-A.8.18
+  title: Use of privileged utility programs
+  description: Use of utility programs restricted and controlled.
+  metric_ids:
+  - KPI-PHI-001
+- id: ISO-A.8.19
+  title: Installation of software on operational systems
+  description: Procedures govern software installation.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.20
+  title: Networks security
+  description: Networks and network devices secured and managed.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.21
+  title: Security of network services
+  description: Security mechanisms for network services.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.22
+  title: Segregation of networks
+  description: Groups of services and users segregated on networks.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.23
+  title: Web filtering
+  description: Access to external websites managed.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.24
+  title: Use of cryptography
+  description: Rules for effective use of cryptography.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.25
+  title: Secure development life cycle
+  description: Rules for secure development established.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.26
+  title: Application security requirements
+  description: Security requirements identified and applied.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.27
+  title: Secure system architecture and engineering principles
+  description: Principles established and applied.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.28
+  title: Secure coding
+  description: Secure coding principles applied.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.29
+  title: Security testing in development and acceptance
+  description: Security testing defined and performed.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.30
+  title: Outsourced development
+  description: Direct and monitor outsourced development.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.31
+  title: Separation of development, test and production
+  description: Environments separated and secured.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.32
+  title: Change management
+  description: Changes to information processing facilities controlled.
+  metric_ids:
+  - KRI-CVE-001
+- id: ISO-A.8.33
+  title: Test information
+  description: Test information selected and protected.
+  metric_ids:
+  - KRI-DLP-001
+- id: ISO-A.8.34
+  title: Protection of information systems during audit testing
+  description: Audit tests planned to minimize operational impact.
+  metric_ids:
+  - KPI-FPR-001

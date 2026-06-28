@@ -1,0 +1,78 @@
+name: VALENCE GRC CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: "pip"
+
+    - name: Install uv and dependencies
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        uv venv
+        source .venv/bin/activate
+        uv pip install -e ".[dev,test]"
+
+    - name: Ruff
+      run: |
+        source .venv/bin/activate
+        ruff check src tests
+
+    - name: Mypy
+      run: |
+        source .venv/bin/activate
+        mypy src/grc_dashboard
+
+    - name: Pytest
+      run: |
+        source .venv/bin/activate
+        pytest tests/ -q
+
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: "pip"
+
+    - name: Install dependencies
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        uv venv
+        source .venv/bin/activate
+        uv pip install -e ".[dev,test,e2e]"
+        playwright install chromium
+
+    - name: Playwright E2E smoke
+      env:
+        VALENCE_SKIP_PIPELINE_SCHEDULER: "true"
+        VALENCE_ENV: test
+      run: |
+        source .venv/bin/activate
+        pytest e2e/ -q -m "not e2e" --browser chromium 2>/dev/null || pytest e2e/test_smoke.py -q
+
+    - name: Public repository boundary check (ADR-0008)
+      run: ./scripts/verify_public_repo.sh
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build API image
+      run: docker build -t valence-grc-api:ci .

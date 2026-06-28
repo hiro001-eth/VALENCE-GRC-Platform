@@ -1,0 +1,36 @@
+framework_name: "CMMC"
+full_name: "CMMC 2.0 Level 2 (NIST SP 800-171)"
+version: "2.0"
+controls:
+  - id: "CMMC-3.1.1"
+    title: "Authorized Access"
+    description: "Limit system access to authorized users."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "CMMC-3.1.2"
+    title: "Transaction & Function Control"
+    description: "Limit access to authorized transactions and functions."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "CMMC-3.3.1"
+    title: "System Auditing"
+    description: "Create and retain system audit records."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "CMMC-3.5.2"
+    title: "Identification & Authentication"
+    description: "Authenticate identities before allowing access."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "CMMC-3.6.1"
+    title: "Incident Response"
+    description: "Establish operational incident-handling capability."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]
+  - id: "CMMC-3.11.2"
+    title: "Vulnerability Scan"
+    description: "Scan for vulnerabilities and remediate."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "CMMC-3.13.1"
+    title: "Boundary Protection"
+    description: "Monitor and control communications at boundaries."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "CMMC-3.14.1"
+    title: "Security Alerts"
+    description: "Identify and respond to security alerts."
+    metric_ids: ["KPI-FPR-001"]

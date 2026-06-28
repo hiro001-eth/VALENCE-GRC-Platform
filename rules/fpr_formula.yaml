@@ -1,0 +1,18 @@
+# Strict FPR Boolean Algebra Rules
+# Prevents false positive denominator manipulation by mandating explicit true/false sets.
+
+false_positive_rate:
+  true_positive_labels:
+    - "true_positive"
+    - "tp"
+    - "confirmed_incident"
+    - "action_taken"
+  
+  false_positive_labels:
+    - "false_positive"
+    - "fp"
+    - "benign_true_positive"
+    - "test_rule"
+    
+  unclassified_treatment: "EXCLUDE" # Ensures denominator integrity
+  stale_data_treatment: "EXCLUDE"

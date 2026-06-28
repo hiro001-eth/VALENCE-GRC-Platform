@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VALENCE GRC — Enterprise Security Platform</title>
+  <meta name="description" content="VALENCE: Enterprise GRC platform for quantitative risk management, DORA/NIS2 compliance, and real-time security metrics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div id="login-page">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-icon"><i class="ph ph-shield-check"></i></div>
+      <div>
+        <div class="login-brand-name">VALENCE GRC</div>
+        <div class="login-brand-tag">Enterprise Security Platform</div>
+      </div>
+    </div>
+    <div class="login-hero">
+      <h1>Enterprise-Grade<br><span>Risk Intelligence</span><br>Platform</h1>
+      <p>Quantitative risk modeling, continuous compliance monitoring, and real-time threat intelligence in a single unified platform.</p>
+    </div>
+    <div class="login-features">
+      <div class="login-feature"><div class="login-feature-dot"></div><span>FAIR-based Monte Carlo Value at Risk quantification</span></div>
+      <div class="login-feature"><div class="login-feature-dot"></div><span>DORA · NIS2 · SOC 2 Type II framework auto-mapping</span></div>
+      <div class="login-feature"><div class="login-feature-dot"></div><span>SHA-256 cryptographic evidence chain for audit submissions</span></div>
+      <div class="login-feature"><div class="login-feature-dot"></div><span>CISA KEV + MITRE ATT&CK live threat correlation</span></div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap" id="login-form-panel">
+      <div class="login-form-eyebrow"><i class="ph ph-sign-in"></i> Secure access</div>
+      <h2>Sign in to VALENCE</h2>
+      <p class="login-sub">Access your GRC metrics and compliance dashboard</p>
+      <div class="login-error" id="login-error"></div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter username" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
+      </div>
+      <button class="btn-login" onclick="handleLogin()" id="login-btn">
+        <i class="ph ph-sign-in"></i> Sign In
+      </button>
+      <div id="sso-section" class="sso-section" style="display:none">
+        <div class="sso-divider"><span>or</span></div>
+        <button type="button" class="btn-sso" id="sso-login-btn" onclick="handleSSOLogin()">
+          <i class="ph ph-shield-check"></i> Sign in with SSO
+        </button>
+      </div>
+      <div class="demo-creds" id="demo-creds-section">
+        <p>Sandbox evaluation accounts <span style="color:var(--text-muted);font-weight:400">(4 curated enterprise scenarios)</span></p>
+        <div class="demo-creds-grid" id="demo-creds-grid">
+          <button type="button" class="demo-cred-btn" onclick="fillCreds('admin','valence123')"><code>admin</code> / valence123</button>
+          <button type="button" class="demo-cred-btn" onclick="fillCreds('ciso','ciso123')"><code>ciso</code> / ciso123</button>
+          <button type="button" class="demo-cred-btn" onclick="fillCreds('analyst','analyst123')"><code>analyst</code> / analyst123</button>
+          <button type="button" class="demo-cred-btn" onclick="fillCreds('auditor','auditor123')"><code>auditor</code> / auditor123</button>
+        </div>
+        <p class="login-sub" id="demo-creds-prod-note" style="display:none;margin-top:12px">
+          Sandbox credentials are rotated in production. Contact your operator for access.
+        </p>
+      </div>
+      <p class="login-sub login-form-footer">
+        <a href="#" onclick="toggleRegister(true);return false">Create your organization workspace</a>
+      </p>
+    </div>
+    <div class="login-form-wrap login-form-wrap--register" id="register-form-panel" style="display:none">
+      <div class="login-form-eyebrow"><i class="ph ph-buildings"></i> Organization workspace</div>
+      <h2>Create your organization</h2>
+      <p class="login-sub">Provision a private VALENCE workspace for your company — same enterprise platform as the sandbox, with your own SIEM pipeline and team access.</p>
+      <div class="register-benefits">
+        <div class="register-benefit"><i class="ph ph-check"></i> Isolated tenant &amp; metric pipeline</div>
+        <div class="register-benefit"><i class="ph ph-check"></i> Admin account with full module access</div>
+        <div class="register-benefit"><i class="ph ph-check"></i> Invite GRC, SOC &amp; IR team members</div>
+        <div class="register-benefit"><i class="ph ph-check"></i> SHA-256 report &amp; evidence lineage</div>
+      </div>
+      <div class="login-error" id="register-error" style="display:none"></div>
+      <div class="form-group"><label>Company name</label><input type="text" id="reg-company" placeholder="Acme Corporation" /></div>
+      <div class="form-group"><label>Admin full name</label><input type="text" id="reg-fullname" placeholder="Jane Smith" /></div>
+      <div class="form-group"><label>Admin username</label><input type="text" id="reg-username" placeholder="jsmith" /></div>
+      <div class="form-group"><label>Admin email</label><input type="email" id="reg-email" placeholder="jsmith@acme.com" /></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-password" placeholder="Min. 8 characters" /></div>
+      <button type="button" class="btn-login" onclick="registerOrganization()"><i class="ph ph-buildings"></i> Create workspace</button>
+      <p class="login-sub login-form-footer">
+        Already have access? <a href="#" onclick="toggleRegister(false);return false">Back to sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ APP ═══════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div>
+          <div class="sidebar-logo-text">VALENCE</div>
+          <div class="sidebar-logo-ver">v2.1 Enterprise</div>
+        </div>
+      </div>
+      <div class="tenant-switcher" style="margin-top: 16px;">
+        <select id="tenant-select" onchange="switchTenant(this.value)" style="width:100%; padding: 8px; background: rgba(255,255,255,0.05); color: var(--sidebar-text); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 12px; cursor: pointer; outline: none;">
+          <option value="demo-global-hq">Loading organizations…</option>
+        </select>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard" data-feature="dashboard">
+          <i class="ph ph-squares-four"></i> Dashboard
+        </div>
+        <div class="nav-item" onclick="navigate('risk')" id="nav-risk">
+          <i class="ph ph-chart-scatter"></i> Risk Analysis
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">CISO Tools</div>
+        <div class="nav-item" onclick="navigate('whatif')" id="nav-whatif">
+          <i class="ph ph-sliders"></i> Risk Simulator
+        </div>
+        <div class="nav-item" onclick="navigate('benchmarking')" id="nav-benchmarking">
+          <i class="ph ph-chart-bar"></i> Benchmarking
+        </div>
+        <div class="nav-item" onclick="navigate('platform')" id="nav-platform">
+          <i class="ph ph-crown"></i> Platform Edge
+        </div>
+        <div class="nav-item" onclick="navigate('command-center')" id="nav-command-center">
+          <i class="ph ph-crosshair"></i> Risk Command Center
+        </div>
+        <div class="nav-item" onclick="navigate('enterprise')" id="nav-enterprise">
+          <i class="ph ph-buildings"></i> Enterprise
+        </div>
+        <div class="nav-item" onclick="navigate('threat-intel')" id="nav-threat-intel">
+          <i class="ph ph-binoculars"></i> Threat Intel
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Compliance</div>
+        <div class="nav-item" onclick="navigate('compliance')" id="nav-compliance">
+          <i class="ph ph-clipboard-text"></i> Frameworks
+        </div>
+        <div class="nav-item" onclick="navigate('timeline')" id="nav-timeline">
+          <i class="ph ph-calendar-check"></i> Audit Timeline
+        </div>
+        <div class="nav-item" onclick="navigate('evidence')" id="nav-evidence">
+          <i class="ph ph-lock-key"></i> Evidence Vault
+        </div>
+        <div class="nav-item" onclick="navigate('findings')" id="nav-findings">
+          <i class="ph ph-check-square"></i> Audit Findings
+        </div>
+        <div class="nav-item" onclick="navigate('reports')" id="nav-reports">
+          <i class="ph ph-file-text"></i> Reports & Board
+        </div>
+        <div class="nav-item" onclick="navigate('vendors')" id="nav-vendors">
+          <i class="ph ph-storefront"></i> SENTINEL Vendors
+        </div>
+        <div class="nav-item" onclick="navigate('policies')" id="nav-policies">
+          <i class="ph ph-scroll"></i> Policies
+        </div>
+        <div class="nav-item" onclick="navigate('auditor')" id="nav-auditor">
+          <i class="ph ph-gavel"></i> Auditor Portal
+        </div>
+        <div class="nav-item" onclick="navigate('personnel')" id="nav-personnel">
+          <i class="ph ph-users"></i> Personnel & Devices
+        </div>
+        <div class="nav-item" onclick="navigate('questionnaires')" id="nav-questionnaires">
+          <i class="ph ph-question"></i> Questionnaires
+        </div>
+        <div class="nav-item" onclick="navigate('training')" id="nav-training">
+          <i class="ph ph-graduation-cap"></i> Training
+        </div>
+        <div class="nav-item" onclick="navigate('pentest')" id="nav-pentest">
+          <i class="ph ph-bug"></i> Pen Tests
+        </div>
+        <div class="nav-item mobile-only-nav" onclick="navigate('mobile')" id="nav-mobile">
+          <i class="ph ph-device-mobile"></i> Mobile View
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Infrastructure</div>
+        <div class="nav-item" onclick="navigate('connectors')" id="nav-connectors" data-feature="connectors">
+          <i class="ph ph-plug"></i> SIEM Connectors
+        </div>
+        <div class="nav-item" onclick="navigate('team')" id="nav-team" data-feature="team_admin" style="display:none">
+          <i class="ph ph-users-three"></i> Team Access
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div class="user-name" id="user-display-name">Loading...</div>
+          <div class="user-role" id="user-role-display">—</div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()" title="Sign out"><i class="ph ph-sign-out"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="topbar-title">Security Dashboard</h2>
+        <p id="topbar-sub">Real-time GRC metrics and risk quantification</p>
+      </div>
+      <div class="topbar-right">
+        <div class="global-search-wrap" id="global-search-wrap">
+          <i class="ph ph-magnifying-glass"></i>
+          <input type="search" id="global-search-input" placeholder="Search GRC…" autocomplete="off" oninput="debounceGlobalSearch(this.value)" onfocus="debounceGlobalSearch(this.value)" />
+          <div class="global-search-results" id="global-search-results" style="display:none"></div>
+        </div>
+        <div class="live-badge" id="status-badge"><div class="live-dot" id="status-badge-dot"></div><span id="status-badge-text">—</span></div>
+        <button class="btn-refresh" onclick="refreshData()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+      </div>
+    </div>
+
+    <!-- STATUS STRIP -->
+    <div class="status-strip" id="status-strip">
+      <div class="status-strip-left">
+        <div class="status-indicator" id="status-indicator"></div>
+        <div class="status-strip-content">
+          <span class="status-strip-label" id="status-strip-label">System status</span>
+          <span id="status-strip-message" class="status-strip-message">Loading status…</span>
+        </div>
+        <a href="#" class="status-strip-action" id="status-strip-action" style="display:none" onclick="navigate('connectors');return false">
+          <i class="ph ph-plug"></i> Configure SIEM
+        </a>
+      </div>
+      <div class="status-strip-right">
+        <span class="status-meta-pill"><i class="ph ph-database"></i> Vault: <strong id="status-vault-label">SQLite</strong></span>
+        <span class="status-meta-pill"><i class="ph ph-hard-drives"></i> Node: <strong id="status-node-name">valence-grc.local</strong></span>
+        <span class="status-meta-pill status-meta-license"><i class="ph ph-seal-check"></i> License: <strong>ACTIVE</strong></span>
+      </div>
+    </div>
+
+    <!-- ─── DASHBOARD PAGE ─── -->
+    <div class="page active" id="page-dashboard">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Green Metrics</div>
+            <div class="summary-card-icon green"><i class="ph ph-check-circle"></i></div>
+          </div>
+          <div class="summary-value green" id="sum-green">—</div>
+          <div class="summary-sub">Within thresholds</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Amber Metrics</div>
+            <div class="summary-card-icon amber"><i class="ph ph-warning"></i></div>
+          </div>
+          <div class="summary-value amber" id="sum-amber">—</div>
+          <div class="summary-sub">Approaching limits</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Red Metrics</div>
+            <div class="summary-card-icon red"><i class="ph ph-x-circle"></i></div>
+          </div>
+          <div class="summary-value red" id="sum-red">—</div>
+          <div class="summary-sub">SLA breached</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Total ALE (Annual)</div>
+            <div class="summary-card-icon blue"><i class="ph ph-currency-dollar"></i></div>
+          </div>
+          <div class="summary-value blue" id="sum-ale">—</div>
+          <div class="summary-sub">Expected financial exposure</div>
+        </div>
+      </div>
+
+      <div class="readiness-panel" id="readiness-panel">
+        <div class="readiness-panel-header">
+          <div>
+            <div class="section-title" style="margin:0">Compliance Readiness</div>
+            <div class="section-sub">Weighted across all active frameworks — audit-ready score</div>
+          </div>
+          <div class="readiness-overall">
+            <span class="readiness-overall-pct" id="readiness-overall-pct">—%</span>
+            <span class="readiness-overall-label">Overall</span>
+          </div>
+        </div>
+        <div class="readiness-frameworks" id="readiness-frameworks"></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Portfolio RAG Distribution</h3>
+            <p>Status breakdown across all monitored controls</p>
+          </div>
+          <div class="chart-wrapper"><canvas id="chart-rag"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Financial Exposure by Control</h3>
+            <p>95th Percentile Value at Risk (VaR) per metric</p>
+          </div>
+          <div class="chart-wrapper"><canvas id="chart-var"></canvas></div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Security Control Metrics</div>
+          <div class="section-sub" id="last-run-label">Last updated: loading...</div>
+        </div>
+      </div>
+      <div class="metrics-grid" id="metrics-grid"></div>
+    </div>
+
+    <!-- ─── RISK PAGE ─── -->
+    <div class="page" id="page-risk">
+      <div class="summary-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Portfolio ALE</div>
+            <div class="summary-card-icon blue"><i class="ph ph-trend-up"></i></div>
+          </div>
+          <div class="summary-value blue" id="risk-ale">—</div>
+          <div class="summary-sub">Average annual exposure</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">95th Pct VaR</div>
+            <div class="summary-card-icon red"><i class="ph ph-fire"></i></div>
+          </div>
+          <div class="summary-value red" id="risk-var">—</div>
+          <div class="summary-sub">Worst-case scenario</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-card-label">Highest Risk Control</div>
+            <div class="summary-card-icon amber"><i class="ph ph-siren"></i></div>
+          </div>
+          <div class="summary-value amber" style="font-size:16px;padding-top:4px" id="risk-top">—</div>
+          <div class="summary-sub">Requires immediate action</div>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Monte Carlo VaR Distribution</h3>
+            <p>1,000 simulations — Poisson TEF + Log-Normal loss magnitude</p>
+          </div>
+          <div class="chart-wrapper"><canvas id="chart-mc"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Risk Heatmap — 5x5 Likelihood × Impact</h3>
+            <p>Hover over cells to inspect metric positions</p>
+          </div>
+          <div id="heatmap-container"></div>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">CERBERUS Risk Register</div>
+        <div class="section-sub">CVE → risk pipeline from CISA KEV correlation</div>
+      </div>
+      <div id="risk-register-list"></div>
+
+      <!-- CASCADE GRAPH -->
+      <div class="panel" style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <div>
+            <div class="section-title">Cascading Risk Dependency Graph</div>
+            <div class="section-sub">Cross-metric propagation — see downstream impact when controls degrade</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--text-muted)">Simulate:</span>
+            <select id="cascade-simulation-select" onchange="runCascadeSimulation(this.value)">
+              <option value="">— Select Metric —</option>
+            </select>
+          </div>
+        </div>
+        <div id="cascade-results-container" style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;display:none;margin-bottom:14px"></div>
+        <div id="cascade-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px"></div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Risk Ranking — All Controls</div></div>
+      <div id="risk-table"></div>
+    </div>
+
+    <!-- ─── WHAT-IF PAGE ─── -->
+    <div class="page" id="page-whatif">
+      <div class="col-3-2">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div class="panel-title" style="margin:0;padding:0;border:none">Budget Allocation Simulator</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:var(--text-muted)">Load Preset:</span>
+              <select id="whatif-preset-select" onchange="applyWhatIfPreset(this.value)">
+                <option value="">— Custom —</option>
+              </select>
+            </div>
+          </div>
+          <div id="whatif-sliders-container"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:18px">
+            <button class="btn btn-secondary" onclick="resetWhatIfSliders()"><i class="ph ph-arrow-counter-clockwise"></i> Reset All</button>
+            <button class="btn btn-primary" onclick="runWhatIfSimulation()"><i class="ph ph-play"></i> Run Monte Carlo Simulation</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Projected Portfolio Impact</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+            <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Projected VaR (95th)</div>
+              <div id="whatif-proj-var" style="font-size:22px;font-weight:800;color:var(--accent);margin-top:6px">$0</div>
+              <div id="whatif-proj-var-change" style="font-size:11px;color:var(--text-muted);margin-top:3px">Original: —</div>
+            </div>
+            <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Total Investment</div>
+              <div id="whatif-proj-investment" style="font-size:22px;font-weight:800;color:var(--violet);margin-top:6px">$0</div>
+              <div id="whatif-proj-roi" style="font-size:11px;color:var(--green);margin-top:3px">ROI: 0.0x</div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+            <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Projected RAG Distribution</div>
+            <div style="display:flex;height:18px;border-radius:4px;overflow:hidden;background:var(--border)">
+              <div id="whatif-bar-green" style="background:var(--green);width:0%;transition:width 0.4s"></div>
+              <div id="whatif-bar-amber" style="background:var(--amber);width:0%;transition:width 0.4s"></div>
+              <div id="whatif-bar-red"   style="background:var(--red);  width:0%;transition:width 0.4s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px">
+              <span id="whatif-cnt-green">Green: 0</span>
+              <span id="whatif-cnt-amber">Amber: 0</span>
+              <span id="whatif-cnt-red">Red: 0</span>
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Projected Delta Breakdown</div>
+          <div id="whatif-projected-list" style="max-height:200px;overflow-y:auto;font-size:12px"></div>
+          <div id="whatif-roi-summary-text" style="font-size:12px;color:var(--text-muted);padding-top:14px;border-top:1px solid var(--border);line-height:1.6;margin-top:12px">
+            Adjust sliders or apply a preset CISO scenario to simulate VaR reductions.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── BENCHMARKING PAGE ─── -->
+    <div class="page" id="page-benchmarking">
+      <div class="panel" style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px">Benchmark Peer Group</div>
+          <select id="benchmark-industry-select" style="font-size:14px;font-weight:600;width:280px" onchange="loadBenchmarks(this.value)"></select>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Organizational Score</div>
+          <div style="display:flex;align-items:baseline;gap:8px;justify-content:flex-end">
+            <span id="benchmark-org-grade" style="font-size:32px;font-weight:900">B</span>
+            <span id="benchmark-org-percentile" style="font-size:14px;color:var(--text-muted);font-weight:600">(75th percentile)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="summary-card">
+          <div class="summary-card-top"><div class="summary-card-label">Avg Percentile</div><div class="summary-card-icon blue"><i class="ph ph-chart-line-up"></i></div></div>
+          <div class="summary-value blue" id="bench-avg-percentile">0%</div>
+          <div class="summary-sub">Rank vs peers</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top"><div class="summary-card-label">Leadership Areas</div><div class="summary-card-icon green"><i class="ph ph-medal"></i></div></div>
+          <div class="summary-value green" id="bench-excellent-count">0</div>
+          <div class="summary-sub">Metrics above 75th pct</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top"><div class="summary-card-label">Critical Gaps</div><div class="summary-card-icon red"><i class="ph ph-warning-octagon"></i></div></div>
+          <div class="summary-value red" id="bench-critical-count">0</div>
+          <div class="summary-sub">Metrics below 25th pct</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-top"><div class="summary-card-label">Data Sources</div><div class="summary-card-icon amber"><i class="ph ph-database"></i></div></div>
+          <div class="summary-value amber" style="font-size:14px;padding-top:6px">DBIR + Ponemon + SANS</div>
+          <div class="summary-sub">Verified 2024-2025 feeds</div>
+        </div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Control Metrics vs Industry Peer Benchmarks</div></div>
+      <div id="benchmarking-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px"></div>
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;font-family:'IBM Plex Mono',monospace">
+        Data aggregated from Verizon DBIR 2025, SANS 2024 SOC Survey, and Ponemon Cost of Data Breach 2024.
+      </div>
+    </div>
+
+    <!-- ─── TIMELINE PAGE ─── -->
+    <div class="page" id="page-timeline">
+      <div class="scrubber-card">
+        <h3>Security Posture Scrubber</h3>
+        <p>Replay 90 days of history — trace RAG transitions and audit event linkages</p>
+        <div class="scrubber-control">
+          <button class="btn btn-secondary btn-sm" onclick="toggleTimelinePlay()" id="btn-timeline-play">
+            <i class="ph ph-play"></i> Play
+          </button>
+          <input type="range" min="0" max="90" value="90" class="scrubber-slider" id="timeline-range-scrubber" oninput="scrubTimeline(this.value)">
+          <div class="scrubber-date" id="timeline-scrub-date">Loading...</div>
+        </div>
+      </div>
+
+      <div class="col-3-2">
+        <div>
+          <div class="chart-card" style="margin-bottom:16px">
+            <div class="chart-card-header">
+              <h3>90-Day Posture Trend</h3>
+              <p>Value at Risk (VaR) over time</p>
+            </div>
+            <div class="chart-wrapper"><canvas id="chart-timeline-trend"></canvas></div>
+          </div>
+          <div class="section-header"><div class="section-title">Correlated Security Events</div></div>
+          <div id="timeline-events-list"></div>
+        </div>
+        <div>
+          <div class="panel" style="position:sticky;top:110px">
+            <div class="panel-title" id="snapshot-title">Snapshot: Continuous Monitoring</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:14px" id="snapshot-timestamp">—</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="background:var(--bg-base);padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--text-muted);font-weight:600">Projected ALE</div>
+                <div style="font-size:16px;font-weight:800;color:var(--accent);margin-top:4px" id="snapshot-ale">—</div>
+              </div>
+              <div style="background:var(--bg-base);padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--text-muted);font-weight:600">RAG (G/A/R)</div>
+                <div style="font-size:16px;font-weight:800;margin-top:4px" id="snapshot-gar">—</div>
+              </div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Snapshot Metrics</div>
+            <div id="snapshot-metrics-list" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── THREAT INTEL PAGE ─── -->
+    <div class="page" id="page-threat-intel">
+      <div class="panel" style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">CISA + MITRE ATT&CK Threat Index</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <h2 id="threat-intel-level" style="font-size:24px;font-weight:900">GUARDED</h2>
+            <span class="live-dot" id="threat-intel-pulse" style="background:var(--green)"></span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">Exposure Assessment</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary)" id="threat-intel-count-alerts">0 Correlated Exposures</div>
+        </div>
+      </div>
+
+      <div class="col-3-2">
+        <div>
+          <div class="section-header">
+            <div>
+              <div class="section-title">Correlated Exposure Alerts</div>
+              <div class="section-sub">Active threat actor activities mapped to your weak controls</div>
+            </div>
+          </div>
+          <div id="threat-intel-feed-note" style="font-size:12px;color:var(--text-muted);margin-bottom:12px;padding:10px 12px;background:var(--bg-base);border-radius:8px;border:1px solid var(--border)"></div>
+          <div id="threat-intel-alerts" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+        </div>
+        <div>
+          <div class="panel">
+            <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0">
+              <button class="fw-tab active" id="btn-tab-kev" onclick="switchThreatTab('kev')">CISA KEV Catalog</button>
+              <button class="fw-tab" id="btn-tab-mitre" onclick="switchThreatTab('mitre')">MITRE ATT&CK Trends</button>
+            </div>
+            <div id="threat-tab-content" style="max-height:500px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── EVIDENCE VAULT PAGE ─── -->
+    <div class="page" id="page-evidence">
+      <div id="evidence-vault-status" class="evidence-header">
+        <div class="evidence-header-left">
+          <div class="evidence-header-icon"><i class="ph ph-shield-check"></i></div>
+          <div>
+            <div class="evidence-header-title">Evidence Cryptographic Chain Validated</div>
+            <div class="evidence-header-sub">All metric snapshots are SHA-256 chained in a tamper-proof immutable lineage.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <select id="evidence-export-framework" style="font-size:12px;padding:6px 12px">
+            <option value="SOC2">SOC 2 Type II</option>
+            <option value="DORA">DORA 2025</option>
+            <option value="NIS2">NIS2</option>
+            <option value="ISO27001">ISO 27001:2022</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="exportEvidencePack()"><i class="ph ph-export"></i> Export Evidence Pack</button>
+        </div>
+      </div>
+
+      <div class="col-1-3">
+        <div>
+          <div class="panel">
+            <div class="panel-title">Chain Metrics</div>
+            <div class="kv-row"><span class="kv-label">Hash Algorithm</span><strong id="evd-algorithm" class="kv-val" style="font-family:'IBM Plex Mono',monospace">SHA-256</strong></div>
+            <div class="kv-row"><span class="kv-label">Total Records</span><strong id="evd-total-records" class="kv-val">—</strong></div>
+            <div style="margin-top:14px">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-weight:500">Latest Chain Hash</div>
+              <code id="evd-latest-hash" style="display:block;background:var(--bg-base);padding:8px;border-radius:4px;font-size:10px;word-break:break-all;border:1px solid var(--border);color:var(--text-secondary)">—</code>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-header">
+            <div>
+              <div class="section-title">Cryptographic Lineage Ledger</div>
+              <div class="section-sub">Immutable continuous audit logs — SHA-256 hash-chain evidence vault</div>
+            </div>
+          </div>
+          <div id="evidence-ledger-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── COMPLIANCE PAGE ─── -->
+    <div class="page" id="page-compliance">
+      <div class="fw-tabs" id="fw-tabs"></div>
+      <div id="fw-full-name" style="font-size:12px;color:var(--text-muted);margin-bottom:18px"></div>
+      <div class="compliance-overview">
+        <div class="coverage-ring-wrap">
+          <canvas id="chart-coverage" width="160" height="160"></canvas>
+          <div class="coverage-pct" id="coverage-pct">—%</div>
+          <div class="coverage-sub">Compliant</div>
+        </div>
+        <div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+            <div class="summary-card" style="padding:14px">
+              <div class="summary-card-label">Compliant</div>
+              <div class="summary-value green" style="font-size:24px;margin-top:8px" id="fw-compliant">—</div>
+            </div>
+            <div class="summary-card" style="padding:14px">
+              <div class="summary-card-label">At Risk</div>
+              <div class="summary-value amber" style="font-size:24px;margin-top:8px" id="fw-at-risk">—</div>
+            </div>
+            <div class="summary-card" style="padding:14px">
+              <div class="summary-card-label">Non-Compliant</div>
+              <div class="summary-value red" style="font-size:24px;margin-top:8px" id="fw-nc">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-header"><div class="section-title">Control Detail</div><div class="section-sub">Linked evidence from automated pipeline runs</div></div>
+      <div id="controls-list"></div>
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">Continuous Control Monitoring</div>
+        <div class="section-sub">Automated tests — Vanta/Drata-style CCM powered by live SIEM metrics</div>
+      </div>
+      <div id="ccm-summary" class="readiness-frameworks" style="margin-bottom:12px"></div>
+      <div id="ccm-tests-list" style="margin-bottom:20px"></div>
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">Remediation Tasks</div>
+        <div class="section-sub">Owners, SLAs, and deadlines — ServiceNow-style workflow</div>
+      </div>
+      <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="loadRemediationTasks()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+        <button class="btn btn-primary btn-sm" onclick="createRemediationFromGaps()"><i class="ph ph-list-checks"></i> Create from gaps</button>
+      </div>
+      <div id="remediation-tasks-list" style="margin-bottom:20px"></div>
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">Cross-Framework Map</div>
+        <div class="section-sub">Unified controls across SOC 2, ISO, HIPAA, GDPR, NIST</div>
+      </div>
+      <div id="cross-framework-list" style="margin-bottom:20px"></div>
+      <div class="section-header">
+        <div class="section-title">AI Gap Prioritization</div>
+        <div class="section-sub">Ranked remediation suggestions from live compliance posture</div>
+      </div>
+      <div style="margin-bottom:12px">
+        <button class="btn btn-secondary btn-sm" onclick="loadComplianceGaps()"><i class="ph ph-brain"></i> Analyze gaps</button>
+        <button class="btn btn-primary btn-sm" onclick="runAutoRemediate()"><i class="ph ph-robot"></i> Auto-fix top gaps</button>
+      </div>
+      <div id="compliance-gaps-list" style="margin-bottom:20px"></div>
+      <div class="section-header" style="margin-top:24px"><div class="section-title">Evidence Requests</div><div class="section-sub">Auditor workflow — request and track control evidence</div></div>
+      <div style="margin-bottom:12px"><button class="btn btn-secondary btn-sm" onclick="showEvidenceRequestModal()"><i class="ph ph-plus"></i> Request evidence</button></div>
+      <div id="evidence-requests-list"></div>
+    </div>
+
+    <!-- ─── REPORTS PAGE ─── -->
+    <div class="page" id="page-reports">
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-title">AI Executive Board Deck Generator</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px">Generate a complete board slide deck with natural-language narratives and ROI forecasts — ready for C-Suite presentation.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+          <div class="field-group">
+            <div class="field-label">Quarter</div>
+            <select id="board-quarter">
+              <option value="Q2 2025">Q2 2025 (Current)</option>
+              <option value="Q3 2025">Q3 2025 (Projected)</option>
+              <option value="Q4 2025">Q4 2025 (Projected)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Audience</div>
+            <select id="board-audience">
+              <option value="Board of Directors">Board of Directors</option>
+              <option value="Risk Committee">Risk &amp; Audit Committee</option>
+              <option value="Executive C-Suite">Executive C-Suite</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Narrative Tone</div>
+            <select id="board-tone">
+              <option value="executive">Executive (FAIR-centered)</option>
+              <option value="technical">Technical (SLA-centered)</option>
+              <option value="regulatory">Regulatory (Compliance-centered)</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="generateBoardDeck()">
+              <i class="ph ph-presentation-chart"></i> Generate Board Deck
+            </button>
+          </div>
+        </div>
+        <div id="deck-presentation-wrapper" style="display:none;margin-top:20px">
+          <div class="deck-wrap">
+            <div id="deck-slides-container"></div>
+            <div class="deck-nav">
+              <button class="btn btn-secondary btn-sm" onclick="prevSlide()"><i class="ph ph-caret-left"></i> Previous</button>
+              <div class="deck-dots" id="deck-dots"></div>
+              <button class="btn btn-secondary btn-sm" onclick="nextSlide()">Next <i class="ph ph-caret-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <button class="btn btn-primary" onclick="generateReport()"><i class="ph ph-file-pdf"></i> Generate PDF Report</button>
+      </div>
+
+      <div class="panel schedule-panel" style="margin-bottom:24px">
+        <div class="panel-title"><i class="ph ph-calendar-check"></i> Scheduled Auditor Exports</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Automated PDF evidence packs for your auditor — daily, weekly, or monthly delivery.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end;margin-bottom:16px">
+          <div class="field-group">
+            <div class="field-label">Frequency</div>
+            <select id="schedule-frequency">
+              <option value="weekly">Weekly</option>
+              <option value="daily">Daily</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Framework</div>
+            <select id="schedule-framework">
+              <option value="SOC2">SOC 2 Type II</option>
+              <option value="DORA">DORA 2025</option>
+              <option value="NIS2">NIS2</option>
+            </select>
+          </div>
+          <div class="field-group" style="grid-column:span 2">
+            <div class="field-label">Auditor email (optional)</div>
+            <input type="email" id="schedule-email" placeholder="auditor@firm.com" />
+          </div>
+          <button class="btn btn-secondary" onclick="createReportSchedule()"><i class="ph ph-plus"></i> Add schedule</button>
+        </div>
+        <div id="schedules-list"></div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Report History</div>
+        <div class="section-sub">Zero-trust cryptographic lineage on every report</div>
+      </div>
+      <div class="reports-toolbar" id="reports-toolbar" style="display:none">
+        <label class="report-select-all">
+          <input type="checkbox" id="reports-select-all" onchange="toggleSelectAllReports(this.checked)" />
+          <span>Select all completed</span>
+        </label>
+        <div class="reports-toolbar-actions">
+          <span class="reports-selected-count" id="reports-selected-count">0 selected</span>
+          <button class="btn btn-secondary btn-sm" id="reports-download-selected" onclick="downloadSelectedReports()" disabled>
+            <i class="ph ph-download-simple"></i> Download selected
+          </button>
+        </div>
+      </div>
+      <div id="reports-list" class="reports-list"></div>
+    </div>
+
+    <!-- ─── CONNECTORS PAGE ─── -->
+    <div class="page" id="page-connectors">
+      <div class="connector-summary-bar" id="connector-summary-bar">
+        <div class="connector-summary-stat">
+          <div class="stat-val" id="cs-total">—</div>
+          <div class="stat-lbl">Total Connectors</div>
+        </div>
+        <div class="connector-summary-stat">
+          <div class="stat-val" style="color:var(--green)" id="cs-healthy">—</div>
+          <div class="stat-lbl">Healthy</div>
+        </div>
+        <div class="connector-summary-stat">
+          <div class="stat-val" style="color:var(--amber)" id="cs-degraded">—</div>
+          <div class="stat-lbl">Degraded / Inactive</div>
+        </div>
+        <div class="connector-summary-stat">
+          <div class="stat-val" id="cs-events">—</div>
+          <div class="stat-lbl">Events / sec (total)</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 24px;">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="ph ph-database"></i> SIEM Connection</h3>
+            <span style="font-size:11px;color:var(--text-muted)">Per-organization credentials</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>SIEM Platform</label>
+              <select id="config-siem-type">
+                <option value="">Not configured</option>
+                <option value="Elastic">Elastic / ELK</option>
+                <option value="Splunk">Splunk Enterprise</option>
+                <option value="Wazuh">Wazuh (Indexer)</option>
+                <option value="CSV">File upload only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>SIEM Base URL</label>
+              <input type="text" id="config-siem-url" placeholder="https://elastic.company.com:9200" />
+            </div>
+            <div class="form-group">
+              <label>API Key / Token</label>
+              <input type="password" id="config-siem-key" placeholder="Leave blank to keep existing key" />
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="saveSiemConfig()"><i class="ph ph-floppy-disk"></i> Save SIEM</button>
+              <button class="btn btn-secondary" onclick="triggerPipeline()"><i class="ph ph-play"></i> Run pipeline now</button>
+            </div>
+            <p id="siem-config-status" style="font-size:12px;color:var(--text-muted);margin-top:12px"></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="ph ph-bell-ringing"></i> Alert Integrations</h3>
+            <span style="font-size:11px;color:var(--text-muted)">Real-time webhooks</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Slack Webhook URL</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="config-slack-url" placeholder="https://hooks.slack.com/services/..."/>
+                <button class="btn btn-secondary" onclick="testAlert('slack')">Test</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Microsoft Teams Webhook URL</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="config-teams-url" placeholder="https://outlook.office.com/webhook/..."/>
+                <button class="btn btn-secondary" onclick="testAlert('teams')">Test</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>PagerDuty Routing Key</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="config-pagerduty-key" placeholder="Events API V2 Routing Key"/>
+                <button class="btn btn-secondary" onclick="testAlert('pagerduty')">Test</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveIntegrationConfig()">Save Configuration</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="ph ph-file-csv"></i> SIEM Log Ingestion</h3>
+            <span style="font-size:11px;color:var(--text-muted)">Upload structured logs (CSV/JSON)</span>
+          </div>
+          <div class="card-body">
+             <div id="drop-zone" onclick="document.getElementById('siem-log-file').click()" style="border: 2px dashed var(--border-strong); border-radius: var(--radius); padding: 40px; text-align: center; cursor: pointer; transition: background .2s, border-color .2s; margin-bottom: 16px;">
+               <i class="ph ph-upload-simple" style="font-size: 32px; color: var(--accent); margin-bottom: 12px;"></i>
+               <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Click or Drop SIEM logs here</div>
+               <div style="font-size: 12px; color: var(--text-muted)">Supports .csv and .json</div>
+               <input type="file" id="siem-log-file" style="display:none" accept=".csv,.json" onchange="handleLogUpload(this.files[0])">
+             </div>
+             <div id="upload-status" style="font-size:12px; color:var(--green); font-weight:600;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">Integration Marketplace</div>
+        <div class="section-sub"><span id="marketplace-total">—</span> integrations · <span id="marketplace-live-count" style="color:var(--green)">—</span> live · <span id="marketplace-roadmap-count" style="color:var(--text-muted)">—</span> roadmap</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <input type="text" id="marketplace-search" placeholder="Search integrations…" style="flex:1;min-width:200px;padding:8px 12px;border-radius:8px;border:1px solid var(--border)" oninput="debounceMarketplaceSearch()" />
+        <select id="marketplace-category" onchange="loadMarketplace(1)" style="padding:8px;border-radius:8px">
+          <option value="">All categories</option>
+        </select>
+        <select id="marketplace-availability" onchange="loadMarketplace(1)" style="padding:8px;border-radius:8px">
+          <option value="">All availability</option>
+          <option value="live">Live only</option>
+          <option value="roadmap">Roadmap</option>
+        </select>
+      </div>
+      <div id="marketplace-grid" class="marketplace-grid" style="margin-bottom:12px"></div>
+      <div id="marketplace-pagination" style="display:flex;gap:8px;margin-bottom:24px"></div>
+
+      <div class="section-header">
+        <div class="section-title">Active Connectors</div>
+        <div class="section-sub">Data source health status</div>
+      </div>
+      <div class="connector-grid" id="connectors-list"></div>
+    </div>
+
+    <!-- ─── TEAM ACCESS PAGE (org admin) ─── -->
+    <div class="page" id="page-team">
+      <div class="team-page-hero">
+        <div class="team-hero-text">
+          <div class="team-hero-eyebrow"><i class="ph ph-users-three"></i> Identity &amp; Access</div>
+          <h2 class="team-hero-title">Team Access Management</h2>
+          <p class="team-hero-sub">Provision GRC, SOC, and IR team members with role-based credentials and module-level permissions.</p>
+        </div>
+        <div class="team-hero-stats">
+          <div class="team-stat-card">
+            <div class="team-stat-value" id="team-member-count">—</div>
+            <div class="team-stat-label">Active members</div>
+          </div>
+          <div class="team-stat-card">
+            <div class="team-stat-value" id="team-dept-count">4</div>
+            <div class="team-stat-label">Department presets</div>
+          </div>
+          <div class="team-stat-card team-stat-accent">
+            <div class="team-stat-value"><i class="ph ph-shield-check"></i></div>
+            <div class="team-stat-label">RBAC enforced</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="team-layout">
+        <div class="team-panel team-panel-invite">
+          <div class="team-panel-header">
+            <div class="team-panel-icon"><i class="ph ph-user-plus"></i></div>
+            <div>
+              <h3>Invite team member</h3>
+              <p>Create credentials and assign module access for a new user</p>
+            </div>
+          </div>
+          <div class="team-panel-body">
+            <div class="team-form-section">
+              <div class="team-form-section-title">Identity</div>
+              <div class="team-form-row">
+                <div class="form-group"><label>Full name</label><input type="text" id="team-fullname" placeholder="Alex Rivera" /></div>
+                <div class="form-group"><label>Username</label><input type="text" id="team-username" placeholder="arivera" /></div>
+              </div>
+              <div class="team-form-row">
+                <div class="form-group"><label>Email</label><input type="email" id="team-email" placeholder="arivera@company.com" /></div>
+                <div class="form-group"><label>Temporary password</label><input type="password" id="team-password" placeholder="Min. 8 characters" /></div>
+              </div>
+            </div>
+
+            <div class="team-form-section team-access-block">
+              <div class="team-form-section-title">Department preset</div>
+              <p class="team-block-hint">Choose a team to auto-select the right modules. Custom lets you pick manually.</p>
+              <div class="team-dept-grid" id="team-dept-grid">
+                <button type="button" class="team-dept-card active" data-dept="grc" onclick="selectDepartment('grc')">
+                  <i class="ph ph-clipboard-text"></i>
+                  <span class="team-dept-name">GRC</span>
+                  <span class="team-dept-desc">Compliance &amp; audit</span>
+                </button>
+                <button type="button" class="team-dept-card" data-dept="soc" onclick="selectDepartment('soc')">
+                  <i class="ph ph-radar"></i>
+                  <span class="team-dept-name">SOC</span>
+                  <span class="team-dept-desc">Detection &amp; monitoring</span>
+                </button>
+                <button type="button" class="team-dept-card" data-dept="ir" onclick="selectDepartment('ir')">
+                  <i class="ph ph-scissors"></i>
+                  <span class="team-dept-name">IR</span>
+                  <span class="team-dept-desc">Incident response</span>
+                </button>
+                <button type="button" class="team-dept-card" data-dept="general" onclick="selectDepartment('general')">
+                  <i class="ph ph-sliders-horizontal"></i>
+                  <span class="team-dept-name">Custom</span>
+                  <span class="team-dept-desc">Pick modules manually</span>
+                </button>
+              </div>
+              <select id="team-department" onchange="applyDepartmentPreset()" style="display:none">
+                <option value="grc">GRC / Compliance</option>
+                <option value="soc">SOC / Detection</option>
+                <option value="ir">Incident Response</option>
+                <option value="general">General / Custom</option>
+              </select>
+            </div>
+
+            <div class="team-form-section team-access-block">
+              <div class="team-form-section-title">Platform role</div>
+              <p class="team-block-hint">Controls permission level across the workspace.</p>
+              <div class="team-role-grid" id="team-role-grid">
+                <button type="button" class="team-role-card active" data-role="analyst" onclick="selectRole('analyst')">
+                  <span class="team-role-name">Analyst</span>
+                  <span class="team-role-desc">Metrics &amp; investigations</span>
+                </button>
+                <button type="button" class="team-role-card" data-role="auditor" onclick="selectRole('auditor')">
+                  <span class="team-role-name">Auditor</span>
+                  <span class="team-role-desc">Evidence &amp; compliance</span>
+                </button>
+                <button type="button" class="team-role-card" data-role="ciso" onclick="selectRole('ciso')">
+                  <span class="team-role-name">CISO</span>
+                  <span class="team-role-desc">Executive risk view</span>
+                </button>
+                <button type="button" class="team-role-card" data-role="admin" onclick="selectRole('admin')">
+                  <span class="team-role-name">Admin</span>
+                  <span class="team-role-desc">Full workspace control</span>
+                </button>
+              </div>
+              <p class="team-role-summary" id="team-role-summary">Analyst — operational access to assigned modules.</p>
+              <select id="team-role" style="display:none"><option value="analyst">Analyst</option><option value="auditor">Auditor</option><option value="ciso">CISO</option><option value="admin">Admin</option></select>
+            </div>
+
+            <div class="team-form-section">
+              <div class="team-form-section-title">Module access <span class="team-form-hint">Toggle which sections this user can see</span></div>
+              <div id="team-features-grid" class="team-features-grid"></div>
+            </div>
+
+            <button class="btn btn-primary team-submit-btn" onclick="inviteTeamMember()">
+              <i class="ph ph-paper-plane-tilt"></i> Create access credentials
+            </button>
+          </div>
+        </div>
+
+        <div class="team-panel team-panel-roster">
+          <div class="team-panel-header">
+            <div class="team-panel-icon team-panel-icon-alt"><i class="ph ph-users"></i></div>
+            <div>
+              <h3>Team roster</h3>
+              <p>Active users in your organization workspace</p>
+            </div>
+          </div>
+          <div class="team-panel-body team-roster-body" id="team-members-list">
+            <div class="team-loading"><i class="ph ph-spinner"></i> Loading team…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="team-sso-card" id="team-sso-card">
+        <div class="team-sso-icon"><i class="ph ph-microsoft-outlook-logo"></i></div>
+        <div class="team-sso-content" id="team-sso-info">Loading SSO status…</div>
+      </div>
+    </div>
+
+    <!-- Team edit modal -->
+    <div class="modal-overlay" id="team-edit-modal" style="display:none" onclick="closeTeamEditModal()">
+      <div class="modal-card team-edit-modal" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeTeamEditModal()"><i class="ph ph-x"></i></span>
+        <div class="team-modal-header">
+          <div class="team-panel-icon"><i class="ph ph-user-gear"></i></div>
+          <div><h3>Edit team member</h3><p>Update role, department, and module access</p></div>
+        </div>
+        <input type="hidden" id="team-edit-id" />
+        <div class="form-group"><label>Full name</label><input type="text" id="team-edit-fullname" /></div>
+        <div class="team-form-row">
+          <div class="form-group"><label>Role</label>
+            <select id="team-edit-role"><option value="analyst">Analyst</option><option value="auditor">Auditor</option><option value="ciso">CISO</option><option value="admin">Admin</option></select>
+          </div>
+          <div class="form-group"><label>Department</label>
+            <select id="team-edit-department"><option value="grc">GRC</option><option value="soc">SOC</option><option value="ir">IR</option><option value="general">General</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Reset password (optional)</label><input type="password" id="team-edit-password" placeholder="Leave blank to keep current" /></div>
+        <div class="form-group"><label>Module access</label><div id="team-edit-features" class="team-features-grid"></div></div>
+        <div class="team-modal-actions">
+          <button class="btn btn-secondary" onclick="closeTeamEditModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveTeamMemberEdit()"><i class="ph ph-floppy-disk"></i> Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SENTINEL VENDORS PAGE ─── -->
+    <div class="page" id="page-vendors">
+      <div class="vendor-exec-header">
+        <div class="mobile-exec-org" id="vendor-org-name">Your organization</div>
+        <div class="mobile-exec-mode" id="vendor-data-mode"></div>
+      </div>
+      <div class="readiness-panel" id="vendor-overview" style="margin-bottom:20px"></div>
+      <div id="vendor-summary" class="readiness-frameworks" style="margin-bottom:20px"></div>
+      <div class="section-header">
+        <div class="section-title">Vendor roster</div>
+        <div class="section-sub">Sorted by SENTINEL risk score (highest first)</div>
+      </div>
+      <div style="margin-bottom:12px"><button class="btn btn-primary btn-sm" onclick="addVendor()"><i class="ph ph-plus"></i> Add vendor</button></div>
+      <div id="vendors-list"></div>
+    </div>
+
+    <!-- ─── MOBILE DASHBOARD ─── -->
+    <div class="page" id="page-mobile">
+      <div class="mobile-snapshot" id="mobile-snapshot">
+        <div class="mobile-exec-header">
+          <div class="mobile-exec-org" id="mobile-org-name">Your organization</div>
+          <div class="mobile-exec-mode" id="mobile-data-mode"></div>
+        </div>
+        <div class="mobile-snapshot-hero">
+          <div class="mobile-snapshot-pct" id="mobile-readiness">—</div>
+          <div class="mobile-snapshot-label">Compliance Readiness</div>
+          <div class="mobile-rag-pills" id="mobile-rag-pills"></div>
+        </div>
+        <div class="mobile-section-label">Metrics needing attention</div>
+        <div class="mobile-metrics" id="mobile-metrics"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="navigate('reports')"><i class="ph ph-file-pdf"></i> Latest Report</button>
+      </div>
+    </div>
+
+    <!-- ─── POLICIES PAGE ─── -->
+    <div class="page" id="page-policies">
+      <div class="section-header">
+        <div class="section-title">Policy Library & Attestation</div>
+        <div class="section-sub">Published policies with employee attestation tracking</div>
+      </div>
+      <div class="readiness-panel" id="policy-attestation-summary" style="margin-bottom:20px"></div>
+      <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="seedPolicyTemplates()"><i class="ph ph-books"></i> Load policy templates</button>
+      </div>
+      <div id="policies-list"></div>
+    </div>
+
+    <!-- ─── AUDITOR PORTAL ─── -->
+    <div class="page" id="page-auditor">
+      <div class="section-header">
+        <div class="section-title">Auditor Workspace</div>
+        <div class="section-sub">Read-only consolidated view for external auditors</div>
+      </div>
+      <div id="auditor-dashboard"></div>
+    </div>
+
+    <!-- ─── PERSONNEL & DEVICES ─── -->
+    <div class="page" id="page-personnel">
+      <div class="section-header">
+        <div class="section-title">Personnel Lifecycle & Device Compliance</div>
+        <div class="section-sub">JML access reviews and MDM endpoint posture</div>
+      </div>
+      <div class="fw-tabs" id="personnel-tabs">
+        <button class="fw-tab active" onclick="loadPersonnelTab('jml',this)">JML Events</button>
+        <button class="fw-tab" onclick="loadPersonnelTab('devices',this)">Devices</button>
+        <button class="fw-tab" onclick="loadPersonnelTab('trust',this)">Trust Center</button>
+      </div>
+      <div id="personnel-content"></div>
+    </div>
+
+    <!-- ─── QUESTIONNAIRES ─── -->
+    <div class="page" id="page-questionnaires">
+      <div class="section-header">
+        <div class="section-title">Security Questionnaire Auto-Fill</div>
+        <div class="section-sub">SIG Lite responses generated from live metrics and compliance posture</div>
+      </div>
+      <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="runQuestionnaireAutoFill()"><i class="ph ph-magic-wand"></i> Auto-fill from metrics</button>
+        <button class="btn btn-secondary" onclick="runAiQuestionnaireDraft('sig_lite')"><i class="ph ph-robot"></i> AI draft SIG Lite</button>
+        <button class="btn btn-secondary" onclick="runAiQuestionnaireDraft('caiq')"><i class="ph ph-robot"></i> AI draft CAIQ</button>
+        <button class="btn btn-secondary" onclick="runAiQuestionnaireDraft('soc2_readiness')"><i class="ph ph-robot"></i> AI draft SOC 2</button>
+        <button class="btn btn-secondary btn-sm" onclick="loadQuestionnaireLibrary()"><i class="ph ph-books"></i> Template library</button>
+      </div>
+      <div id="questionnaire-library" style="margin-bottom:16px"></div>
+      <div id="questionnaire-content"></div>
+    </div>
+
+    <!-- ─── PEN TEST PAGE ─── -->
+    <div class="page" id="page-pentest">
+      <div class="section-header">
+        <div class="section-title">Penetration Test Program</div>
+        <div class="section-sub">Schedule assessments, track findings, and link reports to evidence vault</div>
+      </div>
+      <div style="margin-bottom:12px"><button class="btn btn-primary btn-sm" onclick="schedulePentest()"><i class="ph ph-plus"></i> Schedule assessment</button></div>
+      <div id="pentest-list"></div>
+    </div>
+
+    <!-- ─── PLATFORM EDGE PAGE ─── -->
+    <div class="page" id="page-platform">
+      <div class="section-header">
+        <div class="section-title">VALENCE vs Vanta · Drata · ServiceNow · MetricStream</div>
+        <div class="section-sub">Where we win — and what is shipping next</div>
+      </div>
+      <div id="platform-competitive-matrix"></div>
+    </div>
+
+    <!-- ─── RISK COMMAND CENTER ─── -->
+    <div class="page" id="page-command-center">
+      <div class="section-header">
+        <div class="section-title">Risk Command Center</div>
+        <div class="section-sub">Live SIEM telemetry → compliance controls → FAIR financial exposure</div>
+      </div>
+      <div id="command-center-content"></div>
+    </div>
+
+    <!-- ─── ENTERPRISE PAGE ─── -->
+    <div class="page" id="page-enterprise">
+      <div class="section-header">
+        <div class="section-title">Enterprise Command Center</div>
+        <div class="section-sub">Multi-BU workflows · ITSM sync · CMDB · Integration hub · Auditor marketplace</div>
+      </div>
+      <div id="integration-hub-stats" class="readiness-frameworks" style="margin-bottom:20px"></div>
+      <div class="fw-tabs" id="enterprise-tabs">
+        <button class="fw-tab active" onclick="loadEnterpriseTab('workflows',this)">Workflows</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('itsm',this)">ITSM & CMDB</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('changes',this)">Change Mgmt</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('auditors',this)">Auditor Marketplace</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('oauth',this)">OAuth Providers</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('billing',this)">Billing</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('msp',this)">MSP Console</button>
+        <button class="fw-tab" onclick="loadEnterpriseTab('import',this)">Vanta Import</button>
+      </div>
+      <div id="enterprise-content"></div>
+    </div>
+
+    <!-- ─── TRAINING PAGE ─── -->
+    <div class="page" id="page-training">
+      <div class="section-header">
+        <div class="section-title">Security Awareness Training</div>
+        <div class="section-sub">Required courses with completion tracking and evidence vault linkage</div>
+      </div>
+      <div class="readiness-panel" id="training-summary" style="margin-bottom:20px"></div>
+      <div id="training-list"></div>
+    </div>
+
+    <!-- ─── FINDINGS PAGE ─── -->
+    <div class="page" id="page-findings">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div class="section-header" style="margin-bottom:0">
+          <div class="section-title">Audit Findings & Action Plans</div>
+          <div class="section-sub">Track compliance gaps from detection to evidence upload</div>
+        </div>
+        <button class="btn btn-primary" onclick="openNewFindingModal()"><i class="ph ph-plus"></i> Log Finding</button>
+      </div>
+      <div style="display:grid; gap: 16px;" id="findings-list">
+        <!-- Findings injected via JS -->
+      </div>
+    </div>
+  </main>
+  <nav class="mobile-bottom-bar" id="mobile-bottom-bar">
+    <button onclick="navigate('mobile')"><i class="ph ph-device-mobile"></i><span>Mobile</span></button>
+    <button onclick="navigate('dashboard')"><i class="ph ph-squares-four"></i><span>Home</span></button>
+    <button onclick="navigate('risk')"><i class="ph ph-chart-scatter"></i><span>Risk</span></button>
+    <button onclick="navigate('reports')"><i class="ph ph-file-text"></i><span>Reports</span></button>
+  </nav>
+</div>
+
+<!-- ─── AI EXPLAIN MODAL ─── -->
+<div class="modal-overlay" id="explain-modal" onclick="closeExplainModal()">
+  <div class="modal-card" style="width:560px" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeExplainModal()"><i class="ph ph-x"></i></span>
+    <h3><i class="ph ph-brain" style="color:var(--accent)"></i> Why is this metric red?</h3>
+    <div id="explain-content" style="font-size:14px;line-height:1.7;color:var(--text-secondary);margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- ─── EVIDENCE REQUEST MODAL ─── -->
+<div class="modal-overlay" id="evidence-request-modal" onclick="closeEvidenceRequestModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeEvidenceRequestModal()"><i class="ph ph-x"></i></span>
+    <h3><i class="ph ph-clipboard-text"></i> Request Control Evidence</h3>
+    <div class="form-group" style="margin-top:16px"><label>Control ID</label><input type="text" id="evreq-control-id" placeholder="SOC2-CC6.1" /></div>
+    <div class="form-group"><label>Title</label><input type="text" id="evreq-title" placeholder="Access review evidence" /></div>
+    <div class="form-group"><label>Assignee username</label><input type="text" id="evreq-assignee" placeholder="analyst" /></div>
+    <div class="form-group"><label>Description</label><textarea id="evreq-description" rows="3"></textarea></div>
+    <button class="btn btn-primary" onclick="submitEvidenceRequest()">Submit request</button>
+  </div>
+</div>
+
+<!-- ─── VERIFICATION MODAL ─── -->
+<div class="modal-overlay" id="verification-modal" onclick="closeVerificationModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeVerificationModal()"><i class="ph ph-x"></i></span>
+    <h3><i class="ph ph-lock-key" style="color:var(--accent)"></i> Cryptographic Signature Verification</h3>
+    <div style="background:var(--bg-base);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:13px;line-height:1.7;margin-bottom:16px">
+      <div class="kv-row"><span class="kv-label">Record ID</span><strong id="v-id" style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">EVD-XXXX</strong></div>
+      <div class="kv-row"><span class="kv-label">Timestamp</span><span id="v-timestamp">—</span></div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Previous Hash Reference</div>
+        <code id="v-prev" style="display:block;font-size:10px;background:var(--bg-surface);padding:6px;border-radius:4px;border:1px solid var(--border);word-break:break-all">—</code>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Stored SHA-256 Hash</div>
+        <code id="v-stored" style="display:block;font-size:10px;background:var(--bg-surface);padding:6px;border-radius:4px;border:1px solid var(--border);word-break:break-all">—</code>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Recomputed Hash</div>
+        <code id="v-recomputed" style="display:block;font-size:10px;background:var(--bg-surface);padding:6px;border-radius:4px;border:1px solid var(--border);word-break:break-all">—</code>
+      </div>
+    </div>
+    <div id="verification-result-banner" style="background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+      <i class="ph ph-check-circle"></i> Integrity Confirmed — payload matches ledger signature. Zero tampering detected.
+    </div>
+  </div>
+</div>
+
+<!-- ─── EVIDENCE EXPORT MODAL ─── -->
+<div class="modal-overlay" id="export-modal" onclick="closeExportModal()">
+  <div class="modal-card" style="width:680px" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeExportModal()"><i class="ph ph-x"></i></span>
+    <h3><i class="ph ph-export" style="color:var(--accent)"></i> Compliance Evidence Pack Export</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px" id="export-framework-subtitle">SOC2 Type II — Continuous Monitoring Evidence Pack</p>
+    <div style="background:var(--bg-base);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px;font-size:13px;line-height:1.7">
+      <div class="kv-row"><span class="kv-label">Pack Identifier</span><strong id="exp-pack-id">EVDPACK-XXXX</strong></div>
+      <div class="kv-row"><span class="kv-label">Chained Records Count</span><strong id="exp-count">0</strong></div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Cryptographic Attestation Hash</div>
+        <code id="exp-attestation-hash" style="display:block;font-size:10.5px;background:var(--bg-surface);padding:6px;border-radius:4px;border:1px solid var(--border)">—</code>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Attestation Statement</div>
+        <div id="exp-statement" style="font-style:italic;color:var(--text-secondary)">Loading...</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace">SHA-256 Signature Validation: ACTIVE</span>
+      <button class="btn btn-secondary" onclick="closeExportModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ONBOARDING WIZARD MODAL ─── -->
+<div class="modal-overlay" id="onboarding-modal" style="display:none">
+  <div class="modal-card onboarding-card" onclick="event.stopPropagation()">
+    <div class="onboarding-hero">
+      <h3><i class="ph ph-rocket-launch"></i> Get audit-ready in 3 steps</h3>
+      <p>Connect SIEM → invite your team → export your first auditor pack</p>
+      <div class="onboarding-steps" id="onboarding-steps">
+        <div class="onboarding-step active" data-step="1"><span>1</span> SIEM</div>
+        <div class="onboarding-step" data-step="2"><span>2</span> Team</div>
+        <div class="onboarding-step" data-step="3"><span>3</span> Export</div>
+      </div>
+    </div>
+    <div class="onboarding-body">
+      <div class="onboarding-pane active" id="onboard-pane-1">
+        <div class="form-group">
+          <label>Primary SIEM Integration</label>
+          <select id="wizard-siem">
+            <option value="Splunk">Splunk Enterprise</option>
+            <option value="Elastic">Elastic Security</option>
+            <option value="CSV">Manual CSV / JSON upload</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>SIEM URL (optional)</label>
+          <input type="text" id="wizard-siem-url" placeholder="https://splunk.company.com:8089" />
+        </div>
+        <div class="form-group">
+          <label>Alert channel — Slack webhook (optional)</label>
+          <input type="text" id="wizard-slack" placeholder="https://hooks.slack.com/..." />
+        </div>
+      </div>
+      <div class="onboarding-pane" id="onboard-pane-2">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Invite GRC, SOC, or IR teammates with scoped access. You can skip and add them later from Team Access.</p>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="wizard-invite-email" placeholder="analyst@company.com" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="wizard-invite-username" placeholder="jsmith" />
+          </div>
+          <div class="form-group">
+            <label>Temp password</label>
+            <input type="text" id="wizard-invite-password" placeholder="min 8 characters" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select id="wizard-invite-dept">
+            <option value="grc">GRC / Compliance</option>
+            <option value="soc">SOC / Security Ops</option>
+            <option value="ir">Incident Response</option>
+            <option value="general">General</option>
+          </select>
+        </div>
+      </div>
+      <div class="onboarding-pane" id="onboard-pane-3">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Generate your first cryptographically signed PDF report — the same pack auditors expect for SOC 2 readiness.</p>
+        <div class="onboarding-export-preview">
+          <i class="ph ph-file-pdf" style="font-size:32px;color:var(--accent)"></i>
+          <div>
+            <strong>VALENCE GRC Auditor Export</strong>
+            <div style="font-size:12px;color:var(--text-muted)">SHA-256 lineage · metric narratives · compliance gaps</div>
+          </div>
+        </div>
+        <div id="wizard-export-status" style="font-size:12px;color:var(--text-muted);margin-top:12px"></div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="btn btn-secondary" id="btn-onboard-back" onclick="onboardingBack()" style="display:none"><i class="ph ph-arrow-left"></i> Back</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-secondary" id="btn-onboard-skip" onclick="onboardingSkipStep()">Skip</button>
+        <button class="btn btn-primary" id="btn-onboard-next" onclick="onboardingNext()">Continue <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── NEW FINDING MODAL ─── -->
+<div class="modal-overlay" id="finding-modal" onclick="closeFindingModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeFindingModal()"><i class="ph ph-x"></i></span>
+    <h3 id="finding-modal-title"><i class="ph ph-warning-circle" style="color:var(--amber)"></i> Log Audit Finding</h3>
+    <div class="form-group" style="margin-top:16px;">
+      <label>Title</label>
+      <input type="text" id="finding-title" placeholder="e.g. Unpatched Struts Vulnerability in EU Region"/>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="finding-desc" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:var(--radius-sm); outline:none; font-family:inherit; font-size:13px;" rows="3"></textarea>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="form-group">
+        <label>Severity</label>
+        <select id="finding-severity" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:var(--radius-sm); outline:none;">
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Owner (Assignee)</label>
+        <input type="text" id="finding-owner" placeholder="jane.doe"/>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-primary" onclick="saveFinding()">Save Finding</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── EVIDENCE UPLOAD MODAL ─── -->
+<div class="modal-overlay" id="finding-evidence-modal" onclick="closeFindingEvidenceModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeFindingEvidenceModal()"><i class="ph ph-x"></i></span>
+    <h3><i class="ph ph-upload-simple" style="color:var(--accent)"></i> Upload Remediation Evidence</h3>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">Attach evidence to resolve this finding. This action is cryptographically logged to the vault.</p>
+    <div id="evidence-drop" onclick="document.getElementById('finding-evidence-file').click()" style="border: 2px dashed var(--border-strong); border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; margin-bottom: 16px;">
+      <i class="ph ph-file-pdf" style="font-size: 24px; color: var(--text-muted); margin-bottom: 8px;"></i>
+      <div style="font-weight: 600; color: var(--text-primary);">Click to upload file</div>
+      <input type="file" id="finding-evidence-file" style="display:none" onchange="handleFindingEvidence(this.files[0])">
+    </div>
+    <input type="hidden" id="finding-evidence-id" />
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeFindingEvidenceModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP MODAL (confirm / forms) -->
+<div class="modal-overlay" id="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+  <div class="modal-card app-modal-card" onclick="event.stopPropagation()">
+    <div class="app-modal-header">
+      <div class="app-modal-icon info" id="app-modal-icon-wrap"><i class="ph ph-plugs-connected" id="app-modal-icon"></i></div>
+      <div>
+        <h3 id="app-modal-title">Confirm</h3>
+        <p id="app-modal-subtitle"></p>
+      </div>
+    </div>
+    <div class="app-modal-body" id="app-modal-body"></div>
+    <div class="app-modal-actions" id="app-modal-actions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon-wrap"></span>
+  <span id="toast-msg"></span>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

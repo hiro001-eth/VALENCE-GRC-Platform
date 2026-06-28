@@ -1,0 +1,44 @@
+framework_name: "PCIDSS"
+full_name: "PCI DSS v4.0 Payment Card Industry Data Security Standard"
+version: "4.0"
+controls:
+  - id: "PCI-1.2"
+    title: "Network Security Controls"
+    description: "Configure and maintain network security controls."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "PCI-2.2"
+    title: "System Component Configuration"
+    description: "Apply secure configurations to system components."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "PCI-3.4"
+    title: "PAN Protection"
+    description: "Render PAN unreadable anywhere it is stored."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "PCI-4.2"
+    title: "Transmission Encryption"
+    description: "Protect cardholder data during transmission."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "PCI-7.2"
+    title: "Access Control Systems"
+    description: "Restrict access to system components and data."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "PCI-8.3"
+    title: "User Authentication"
+    description: "Strong authentication for users and administrators."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "PCI-10.2"
+    title: "Audit Logs"
+    description: "Implement audit logs for critical events."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "PCI-10.7"
+    title: "Log Retention and Review"
+    description: "Retain and review audit logs."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "PCI-11.3"
+    title: "Vulnerability Scanning"
+    description: "Perform internal and external vulnerability scans."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "PCI-12.10"
+    title: "Incident Response Plan"
+    description: "Implement and test incident response plan."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]

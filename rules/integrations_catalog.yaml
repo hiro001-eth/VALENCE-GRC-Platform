@@ -1,0 +1,79 @@
+integrations:
+  - id: wazuh
+    name: Wazuh
+    category: siem
+    description: Native Wazuh Indexer connector for alerts and agent telemetry
+    status: available
+    auth_type: api_key
+  - id: splunk
+    name: Splunk Enterprise
+    category: siem
+    description: Splunk ES search and notable events
+    status: available
+    auth_type: token
+  - id: elastic
+    name: Elastic Security
+    category: siem
+    description: Elasticsearch / ELK stack security analytics
+    status: available
+    auth_type: api_key
+  - id: google_workspace
+    name: Google Workspace
+    category: identity
+    description: Read-only OAuth for access reviews and admin audit logs
+    status: available
+    auth_type: oauth
+  - id: aws
+    name: AWS Config
+    category: cloud
+    description: Read-only Config rules and compliance snapshots
+    status: available
+    auth_type: iam
+  - id: github
+    name: GitHub Organization
+    category: devsecops
+    description: Org audit log and branch protection evidence
+    status: available
+    auth_type: pat
+  - id: slack
+    name: Slack
+    category: alerting
+    description: Threshold breach notifications to channels
+    status: available
+    auth_type: webhook
+  - id: pagerduty
+    name: PagerDuty
+    category: alerting
+    description: Incident routing for critical metric breaches
+    status: available
+    auth_type: api_key
+  - id: okta
+    name: Okta
+    category: identity
+    description: IdP lifecycle events, MFA policies, and app assignments
+    status: available
+    auth_type: api_key
+  - id: azure
+    name: Microsoft Azure
+    category: cloud
+    description: Defender secure score, Conditional Access, and Sentinel incidents
+    status: available
+    auth_type: oauth
+  - id: gcp
+    name: Google Cloud Platform
+    category: cloud
+    description: Security Command Center findings and IAM posture
+    status: available
+    auth_type: oauth
+  - id: sentinel
+    name: Azure Sentinel
+    category: siem
+    description: Log Analytics KQL queries for MTTD/MTTR and incident evidence
+    status: available
+    auth_type: oauth
+  - id: jira
+    name: Jira
+    category: itsm
+    description: Auto-create remediation tickets on red metric breaches
+    status: available
+    auth_type: api_key

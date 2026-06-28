@@ -1,0 +1,24 @@
+framework_name: "NIS2"
+full_name: "Network and Information Security Directive 2 (EU 2022/2555)"
+version: "2024"
+controls:
+  - id: "NIS2-ART-21.2a"
+    title: "Policies on Risk Analysis"
+    description: "Establish policies on risk analysis and information system security."
+    metric_ids: ["KRI-MTTD-001"]
+  - id: "NIS2-ART-21.2b"
+    title: "Incident Handling"
+    description: "Implement incident prevention, detection, response, and recovery procedures."
+    metric_ids: ["KRI-MTTR-001"]
+  - id: "NIS2-ART-21.2e"
+    title: "Supply Chain Security"
+    description: "Ensure security of assets in relation to suppliers and providers."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "NIS2-ART-21.2i"
+    title: "Access Control Policies"
+    description: "Enforce multi-factor authentication and privileged account reviews."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "NIS2-ART-21.2j"
+    title: "Cryptography"
+    description: "Use of cryptography and encryption to prevent data leaks."
+    metric_ids: ["KRI-DLP-001"]

@@ -1,0 +1,36 @@
+framework_name: "FedRAMP"
+full_name: "FedRAMP Moderate Baseline"
+version: "Rev 5"
+controls:
+  - id: "FEDRAMP-AC-2"
+    title: "Account Management"
+    description: "Manage system accounts including authorization and monitoring."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "FEDRAMP-AC-17"
+    title: "Remote Access"
+    description: "Authorize and monitor remote access sessions."
+    metric_ids: ["KPI-PHI-001", "KRI-DLP-001"]
+  - id: "FEDRAMP-AU-6"
+    title: "Audit Review"
+    description: "Review and analyze audit records for inappropriate activity."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "FEDRAMP-CA-7"
+    title: "Continuous Monitoring"
+    description: "Develop and implement continuous monitoring strategy."
+    metric_ids: ["KPI-FPR-001", "KRI-MTTD-001"]
+  - id: "FEDRAMP-IR-4"
+    title: "Incident Handling"
+    description: "Implement incident handling capability."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]
+  - id: "FEDRAMP-RA-5"
+    title: "Vulnerability Scanning"
+    description: "Scan for vulnerabilities and remediate findings."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "FEDRAMP-SC-7"
+    title: "Boundary Protection"
+    description: "Monitor and control communications at external boundaries."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "FEDRAMP-SI-2"
+    title: "Flaw Remediation"
+    description: "Identify, report, and correct information system flaws."
+    metric_ids: ["KRI-CVE-001"]

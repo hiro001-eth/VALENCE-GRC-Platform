@@ -1,0 +1,36 @@
+framework_name: "GDPR"
+full_name: "EU General Data Protection Regulation (GDPR)"
+version: "2016/679"
+controls:
+  - id: "GDPR-Art25"
+    title: "Data Protection by Design"
+    description: "Implement appropriate technical and organizational measures."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "GDPR-Art30"
+    title: "Records of Processing"
+    description: "Maintain records of processing activities."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "GDPR-Art32"
+    title: "Security of Processing"
+    description: "Encryption, confidentiality, integrity, and resilience."
+    metric_ids: ["KRI-DLP-001", "KPI-PHI-001"]
+  - id: "GDPR-Art33"
+    title: "Breach Notification to Authority"
+    description: "Notify supervisory authority within 72 hours."
+    metric_ids: ["KRI-MTTD-001"]
+  - id: "GDPR-Art34"
+    title: "Breach Notification to Data Subjects"
+    description: "Communicate high-risk breaches to data subjects."
+    metric_ids: ["KRI-MTTR-001"]
+  - id: "GDPR-Art35"
+    title: "Data Protection Impact Assessment"
+    description: "DPIA for high-risk processing operations."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "GDPR-Art5(1)(f)"
+    title: "Integrity and Confidentiality"
+    description: "Process data securely with appropriate safeguards."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "GDPR-Art5(2)"
+    title: "Accountability"
+    description: "Demonstrate compliance with principles."
+    metric_ids: ["KPI-FPR-001", "KPI-PHI-001"]

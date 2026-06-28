@@ -1,0 +1,19 @@
+{
+  "name": "VALENCE GRC Dashboard",
+  "short_name": "VALENCE GRC",
+  "description": "Enterprise Security Metrics, Risk Quantification & Compliance Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080c14",
+  "theme_color": "#0d1321",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

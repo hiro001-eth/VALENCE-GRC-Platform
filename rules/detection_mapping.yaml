@@ -1,0 +1,22 @@
+# Enterprise Detection Rule Mapping
+# Maps active SIEM/EDR rules to specific MITRE techniques with confidence weighting.
+
+mappings:
+  - rule_id: "SIGMA-001"
+    rule_name: "Suspicious PowerShell Download"
+    confidence: 0.9
+    technique_ids:
+      - "T1059.001" # PowerShell
+      - "T1105"     # Ingress Tool Transfer
+
+  - rule_id: "ELASTIC-002"
+    rule_name: "Kerberoasting Ticket Request"
+    confidence: 0.95
+    technique_ids:
+      - "T1558.003" # Kerberoasting
+      
+  - rule_id: "CROWDSTRIKE-003"
+    rule_name: "LSASS Memory Dump"
+    confidence: 1.0
+    technique_ids:
+      - "T1003.001" # OS Credential Dumping: LSASS Memory

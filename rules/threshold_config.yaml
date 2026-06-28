@@ -1,0 +1,43 @@
+# Deterministic RAG Thresholds
+# Mapped to grc_dashboard.models.rag.RAGThreshold
+thresholds:
+  - threshold_id: "THRESH-MTTD-V1"
+    metric_id: "KRI-MTTD-001"
+    inclusive_exclusive: "[min, max)"
+    green_min: 0.0
+    green_max: 2.0
+    amber_min: 2.0
+    amber_max: 4.0
+    red_min: 4.0
+    red_max: 9999.0
+
+  - threshold_id: "THRESH-MTTR-V2"
+    metric_id: "KPI-MTTR-002"
+    inclusive_exclusive: "[min, max)"
+    green_min: 0.0
+    green_max: 24.0
+    amber_min: 24.0
+    amber_max: 48.0
+    red_min: 48.0
+    red_max: 9999.0
+
+  - threshold_id: "THRESH-FPR-V1"
+    metric_id: "KRI-FPR-003"
+    inclusive_exclusive: "[min, max]"
+    green_min: 0.0
+    green_max: 30.0
+    amber_min: 30.1
+    amber_max: 50.0
+    red_min: 50.1
+    red_max: 100.0
+
+  - threshold_id: "THRESH-COV-V1"
+    metric_id: "KPI-COVERAGE-004"
+    inclusive_exclusive: "[min, max)"
+    # Inverse logic: lower gaps = green
+    green_min: 0.0
+    green_max: 5.0
+    amber_min: 5.0
+    amber_max: 15.0
+    red_min: 15.0
+    red_max: 999.0

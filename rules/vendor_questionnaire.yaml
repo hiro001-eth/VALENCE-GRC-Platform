@@ -1,0 +1,53 @@
+name: "SIG Lite — Vendor Security Assessment"
+version: "1.0"
+questions:
+  - id: encryption_at_rest
+    section: "Data Protection"
+    question: "Is data encrypted at rest using industry-standard algorithms?"
+    maps_to: encryption_at_rest
+    weight: 10
+  - id: encryption_in_transit
+    section: "Data Protection"
+    question: "Is data encrypted in transit (TLS 1.2+)?"
+    maps_to: encryption_in_transit
+    weight: 10
+  - id: mfa_enforcement
+    section: "Access Control"
+    question: "Is MFA enforced for all workforce and privileged accounts?"
+    maps_to: mfa_enforcement
+    weight: 10
+  - id: access_reviews
+    section: "Access Control"
+    question: "Are periodic access reviews performed for privileged users?"
+    maps_to: access_reviews
+    weight: 8
+  - id: incident_response
+    section: "Incident Management"
+    question: "Do you maintain a documented incident response program?"
+    maps_to: incident_response
+    weight: 10
+  - id: vulnerability_management
+    section: "Vulnerability Management"
+    question: "Do you patch critical vulnerabilities within defined SLAs?"
+    maps_to: vulnerability_management
+    weight: 10
+  - id: penetration_testing
+    section: "Assurance"
+    question: "Is annual third-party penetration testing performed?"
+    maps_to: penetration_testing
+    weight: 8
+  - id: business_continuity
+    section: "Resilience"
+    question: "Is a business continuity / disaster recovery plan tested annually?"
+    maps_to: business_continuity
+    weight: 8
+  - id: subprocessors
+    section: "Privacy"
+    question: "Are subprocessors documented with DPAs in place?"
+    maps_to: subprocessors
+    weight: 6
+  - id: data_retention
+    section: "Privacy"
+    question: "Are data retention and deletion policies enforced?"
+    maps_to: data_retention
+    weight: 6

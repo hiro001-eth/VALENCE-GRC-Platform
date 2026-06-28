@@ -1,0 +1,40 @@
+framework_name: "NISTCSF"
+full_name: "NIST Cybersecurity Framework (CSF) 2.0"
+version: "2.0"
+controls:
+  - id: "NIST-GV.OC-01"
+    title: "Organizational Context"
+    description: "Understand organizational cybersecurity context."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "NIST-ID.AM-01"
+    title: "Asset Inventory"
+    description: "Inventories of hardware and software are maintained."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "NIST-PR.AC-01"
+    title: "Identity Management"
+    description: "Identities and credentials are managed."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "NIST-PR.DS-01"
+    title: "Data-at-Rest Protection"
+    description: "Data-at-rest is protected."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "NIST-DE.AE-01"
+    title: "Anomaly Detection"
+    description: "Anomalous activity is detected and analyzed."
+    metric_ids: ["KPI-FPR-001", "KRI-MTTD-001"]
+  - id: "NIST-DE.CM-01"
+    title: "Continuous Monitoring"
+    description: "Networks and systems are monitored."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "NIST-RS.MA-01"
+    title: "Incident Management"
+    description: "Incidents are managed per documented plans."
+    metric_ids: ["KRI-MTTR-001"]
+  - id: "NIST-RS.AN-01"
+    title: "Incident Analysis"
+    description: "Incidents are analyzed for impact and scope."
+    metric_ids: ["KRI-MTTD-001"]
+  - id: "NIST-RC.RP-01"
+    title: "Recovery Planning"
+    description: "Recovery plans are executed during incidents."
+    metric_ids: ["KRI-MTTR-001"]

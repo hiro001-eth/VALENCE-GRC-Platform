@@ -1,0 +1,28 @@
+framework_name: "DORA"
+full_name: "Digital Operational Resilience Act (EU 2022/2554)"
+version: "2025"
+controls:
+  - id: "DORA-ICT-2.1"
+    title: "ICT Risk Management Framework"
+    description: "Establish, maintain and review a sound ICT risk management framework."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]
+  - id: "DORA-ICT-2.2"
+    title: "ICT Asset Management"
+    description: "Identify all sources of ICT risk and maintain inventory of assets."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "DORA-ICT-2.5"
+    title: "Detection of Anomalous Activities"
+    description: "Detect anomalous activities and identify potential single points of failure."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "DORA-ICT-2.6"
+    title: "Response and Recovery"
+    description: "Implement an ICT business continuity policy and disaster recovery plans."
+    metric_ids: ["KRI-MTTR-001"]
+  - id: "DORA-ICT-5.1"
+    title: "Access Control"
+    description: "Ensure access rights are allocated on a need-to-know and least-privilege basis."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "DORA-ICT-5.2"
+    title: "Data Leakage Prevention"
+    description: "Prevent data leakage and ensure security of data in transit and at rest."
+    metric_ids: ["KRI-DLP-001"]

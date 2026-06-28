@@ -1,0 +1,46 @@
+# Unified controls mapped across SOC2, ISO27001, HIPAA, GDPR, NIST CSF
+unified_controls:
+  - id: UCF-AC-001
+    title: Logical Access Control
+    frameworks:
+      SOC2: SOC2-CC6.1
+      ISO27001: ISO-A.5.1
+      HIPAA: HIPAA-164.312(a)(1)
+      GDPR: GDPR-Art32
+      NIST_CSF: NIST-PR.AC-01
+  - id: UCF-IR-001
+    title: Incident Detection & Response
+    frameworks:
+      SOC2: SOC2-CC7.3
+      ISO27001: ISO-A.5.24
+      HIPAA: HIPAA-164.308(a)(6)
+      GDPR: GDPR-Art33
+      NIST_CSF: NIST-RS.MA-01
+  - id: UCF-VM-001
+    title: Vulnerability Management
+    frameworks:
+      SOC2: SOC2-CC7.2
+      ISO27001: ISO-A.8.8
+      HIPAA: HIPAA-164.308(a)(5)
+      NIST_CSF: NIST-DE.CM-01
+  - id: UCF-DP-001
+    title: Data Protection & Encryption
+    frameworks:
+      SOC2: SOC2-CC6.6
+      ISO27001: ISO-A.8.24
+      HIPAA: HIPAA-164.312(e)(1)
+      GDPR: GDPR-Art32
+      PCI_DSS: PCI-3.4
+  - id: UCF-CM-001
+    title: Change Management
+    frameworks:
+      SOC2: SOC2-CC8.1
+      ISO27001: ISO-A.8.2
+      NIST_CSF: NIST-GV.OC-01
+  - id: UCF-AU-001
+    title: Audit Logging & Monitoring
+    frameworks:
+      SOC2: SOC2-CC7.1
+      ISO27001: ISO-A.8.15
+      HIPAA: HIPAA-164.312(b)
+      NIST_CSF: NIST-DE.AE-01

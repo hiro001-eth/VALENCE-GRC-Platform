@@ -1,0 +1,73 @@
+# =============================================================================
+# VALENCE GRC — .gitignore
+# Enforced by ADR-0008 (docs/adr/0008-repository-publication-boundaries.md)
+# =============================================================================
+
+# --- Secrets & environment ---
+.env
+.env.local
+.env.production
+.env.*.local
+!.env.example
+!.env.production.example
+
+# --- Runtime & process state ---
+.valence-api.pid
+*.db
+valence.db
+
+# --- Python artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+.venv/
+env/
+venv/
+
+# --- Build artifacts ---
+build/
+dist/
+*.egg-info/
+
+# --- Demo media & recording (ADR-0008: never commit) ---
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*demo*.log
+demo_record.log
+advance_demo_record.log
+.demo_video_tmp/
+.advance_demo_tmp/
+
+# --- Internal planning & scratch docs (ADR-0008) ---
+docs/PRODUCT_ROADMAP.md
+docs/LAUNCH_READINESS.md
+annotated_file_structure.md
+research_synthesis_report.md
+ADR.md
+
+# --- Generated output ---
+output/*
+!output/.gitkeep
+data/cache/*
+data/demo_credentials.json
+
+# --- Coverage ---
+.coverage
+htmlcov/
+
+# --- OS & editor ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trust Center — VALENCE</title>
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body { background: #0b0f1a; color: #e8ecf4; font-family: system-ui, sans-serif; margin: 0; padding: 40px 20px; }
+    .trust-wrap { max-width: 900px; margin: 0 auto; }
+    .trust-header { margin-bottom: 32px; }
+    .trust-header h1 { margin: 0 0 8px; font-size: 2rem; }
+    .trust-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .trust-badge { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4); padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+    .trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+    .trust-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; }
+    .trust-card h3 { margin: 0 0 8px; font-size: 14px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .trust-pct { font-size: 2rem; font-weight: 700; color: #60a5fa; }
+    .trust-controls li { margin: 8px 0; }
+    .trust-contact { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .error { color: #f87171; }
+    .nda-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .nda-card { background: #111827; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; max-width: 560px; width: 100%; padding: 28px; }
+    .nda-card h2 { margin: 0 0 12px; }
+    .nda-card textarea, .nda-card input { width: 100%; margin: 8px 0 12px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: #e8ecf4; box-sizing: border-box; }
+    .nda-text { max-height: 180px; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #94a3b8; margin-bottom: 16px; white-space: pre-wrap; }
+    .nda-btn { background: #3b82f6; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .nda-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div id="nda-overlay" class="nda-overlay" style="display:none">
+    <div class="nda-card">
+      <h2 id="nda-title">Confidentiality agreement</h2>
+      <div class="nda-text" id="nda-text"></div>
+      <label><input type="checkbox" id="nda-agree" /> I agree to the terms above</label>
+      <input type="text" id="nda-name" placeholder="Full name" />
+      <input type="email" id="nda-email" placeholder="Work email" />
+      <input type="text" id="nda-company" placeholder="Company (optional)" />
+      <button class="nda-btn" id="nda-submit" disabled onclick="acceptNda()">Accept and continue</button>
+    </div>
+  </div>
+
+  <div class="trust-wrap">
+    <div id="trust-loading">Loading trust center…</div>
+    <div id="trust-content" style="display:none">
+      <div class="trust-header">
+        <h1 id="trust-company">—</h1>
+        <p id="trust-desc"></p>
+        <div class="trust-badges" id="trust-badges"></div>
+      </div>
+      <h2>Compliance Posture</h2>
+      <div class="trust-grid" id="trust-frameworks"></div>
+      <h2>Security Controls</h2>
+      <ul class="trust-controls" id="trust-controls"></ul>
+      <div class="trust-contact">
+        <p>Security inquiries: <a id="trust-email" href="#">—</a></p>
+        <p style="font-size:12px;color:#64748b">Powered by VALENCE GRC · Last updated <span id="trust-updated">—</span></p>
+      </div>
+    </div>
+    <div id="trust-error" class="error" style="display:none"></div>
+  </div>
+  <script>
+    const slug = window.location.pathname.split('/').pop();
+    const ndaKey = `trust_nda_${slug}`;
+
+    function renderTrust(data) {
+      document.getElementById('trust-loading').style.display = 'none';
+      document.getElementById('trust-content').style.display = 'block';
+      document.getElementById('trust-company').textContent = data.company_name;
+      document.getElementById('trust-desc').textContent = data.description || '';
+      document.getElementById('trust-badges').innerHTML = (data.badges || []).map(b => `<span class="trust-badge">${b}</span>`).join('');
+      document.getElementById('trust-frameworks').innerHTML = (data.frameworks || []).map(f => `
+        <div class="trust-card">
+          <h3>${f.framework}</h3>
+          <div class="trust-pct">${f.readiness_pct != null ? f.readiness_pct + '%' : '—'}</div>
+          <div style="font-size:13px;color:#94a3b8">Readiness</div>
+        </div>`).join('');
+      const c = data.controls_summary || {};
+      document.getElementById('trust-controls').innerHTML = Object.entries(c).map(([k,v]) =>
+        `<li><strong>${k.replace(/_/g,' ')}:</strong> ${typeof v === 'boolean' ? (v ? 'Yes' : 'No') : v}</li>`).join('');
+      if (data.contact_email) {
+        const a = document.getElementById('trust-email');
+        a.href = 'mailto:' + data.contact_email;
+        a.textContent = data.contact_email;
+      }
+      if (data.last_updated) {
+        document.getElementById('trust-updated').textContent = new Date(data.last_updated).toLocaleDateString();
+      }
+      document.title = `Trust Center — ${data.company_name}`;
+    }
+
+    async function loadTrustContent() {
+      const res = await fetch(`/api/trust-center/public/${slug}/content`);
+      if (!res.ok) throw new Error((await res.json()).detail || 'Not found');
+      renderTrust(await res.json());
+    }
+
+    function showNdaGate(meta) {
+      document.getElementById('trust-loading').style.display = 'none';
+      document.getElementById('nda-title').textContent = `Trust Center — ${meta.company_name}`;
+      document.getElementById('nda-text').textContent = meta.nda_text || '';
+      document.getElementById('nda-overlay').style.display = 'flex';
+      const agree = document.getElementById('nda-agree');
+      const submit = document.getElementById('nda-submit');
+      agree.onchange = () => { submit.disabled = !agree.checked; };
+    }
+
+    async function acceptNda() {
+      const name = document.getElementById('nda-name').value.trim();
+      const email = document.getElementById('nda-email').value.trim();
+      const company = document.getElementById('nda-company').value.trim();
+      if (!name || !email) { alert('Name and email required'); return; }
+      const res = await fetch(`/api/trust-center/public/${slug}/nda-accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signer_name: name, signer_email: email, company }),
+      });
+      if (!res.ok) { alert((await res.json()).detail || 'Could not accept NDA'); return; }
+      localStorage.setItem(ndaKey, '1');
+      document.getElementById('nda-overlay').style.display = 'none';
+      await loadTrustContent();
+    }
+
+    async function loadTrust() {
+      try {
+        const res = await fetch(`/api/trust-center/public/${slug}`);
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Not found');
+        }
+        const meta = await res.json();
+        if (meta.nda_required) {
+          if (localStorage.getItem(ndaKey) === '1') {
+            await loadTrustContent();
+            return;
+          }
+          showNdaGate(meta);
+          return;
+        }
+        renderTrust(meta);
+      } catch (e) {
+        document.getElementById('trust-loading').style.display = 'none';
+        document.getElementById('trust-error').style.display = 'block';
+        document.getElementById('trust-error').textContent = e.message;
+      }
+    }
+    loadTrust();
+  </script>
+</body>
+</html>

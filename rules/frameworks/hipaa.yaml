@@ -1,0 +1,48 @@
+framework_name: "HIPAA"
+full_name: "HIPAA Security Rule (45 CFR Part 164)"
+version: "2013"
+controls:
+  - id: "HIPAA-164.308(a)(1)"
+    title: "Security Management Process"
+    description: "Risk analysis and risk management program."
+    metric_ids: ["KRI-MTTD-001", "KRI-CVE-001"]
+  - id: "HIPAA-164.308(a)(3)"
+    title: "Workforce Security"
+    description: "Authorization and supervision of workforce members."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "HIPAA-164.308(a)(4)"
+    title: "Information Access Management"
+    description: "Access authorization and establishment/modification."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "HIPAA-164.308(a)(5)"
+    title: "Security Awareness Training"
+    description: "Security reminders and protection from malicious software."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "HIPAA-164.308(a)(6)"
+    title: "Security Incident Procedures"
+    description: "Response and reporting of security incidents."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]
+  - id: "HIPAA-164.308(a)(7)"
+    title: "Contingency Plan"
+    description: "Data backup, disaster recovery, and emergency mode."
+    metric_ids: ["KRI-MTTR-001"]
+  - id: "HIPAA-164.312(a)(1)"
+    title: "Access Control"
+    description: "Unique user identification and emergency access."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "HIPAA-164.312(b)"
+    title: "Audit Controls"
+    description: "Record and examine activity in systems with ePHI."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "HIPAA-164.312(c)(1)"
+    title: "Integrity"
+    description: "Protect ePHI from improper alteration or destruction."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "HIPAA-164.312(d)"
+    title: "Person or Entity Authentication"
+    description: "Verify identity of persons or entities accessing ePHI."
+    metric_ids: ["KPI-PHI-001"]
+  - id: "HIPAA-164.312(e)(1)"
+    title: "Transmission Security"
+    description: "Guard against unauthorized access during transmission."
+    metric_ids: ["KRI-DLP-001"]

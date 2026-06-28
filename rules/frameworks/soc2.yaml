@@ -1,0 +1,265 @@
+framework_name: SOC2
+full_name: SOC 2 Type II — Full Trust Services Criteria (CC, A, C, PI, P)
+version: '2017'
+controls:
+- id: SOC2-CC1.1
+  title: Integrity and Ethical Values
+  description: Demonstrate commitment to integrity and ethical values.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC1.2
+  title: Board Oversight
+  description: Board exercises oversight of system development and security.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC1.3
+  title: Organizational Structure
+  description: Establish structures, reporting lines, and authorities.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC1.4
+  title: Commitment to Competence
+  description: Commitment to attract, develop, and retain competent individuals.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC1.5
+  title: Accountability
+  description: Hold individuals accountable for internal control responsibilities.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC2.1
+  title: Internal Communication
+  description: Obtain and use relevant quality information to support controls.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC2.2
+  title: External Communication
+  description: Communicate with external parties regarding matters affecting controls.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-CC2.3
+  title: Security Policies
+  description: Policies communicated to personnel and contractors.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC3.1
+  title: Risk Objectives
+  description: Specify objectives with sufficient clarity to identify risks.
+  metric_ids:
+  - KRI-MTTD-001
+- id: SOC2-CC3.2
+  title: Risk Identification
+  description: Identify risks to achievement of objectives.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC3.3
+  title: Fraud Risk
+  description: Consider potential for fraud in assessing risks.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC3.4
+  title: Change Risk
+  description: Identify and assess changes that could impact controls.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC4.1
+  title: Ongoing Monitoring
+  description: Conduct ongoing and separate evaluations of controls.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC4.2
+  title: Deficiency Communication
+  description: Communicate control deficiencies timely to parties responsible.
+  metric_ids:
+  - KRI-MTTD-001
+- id: SOC2-CC5.1
+  title: Control Selection
+  description: Select and develop control activities that mitigate risks.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC5.2
+  title: Technology Controls
+  description: Deploy technology control activities through policies.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC5.3
+  title: Policy Deployment
+  description: Deploy control activities through policies and procedures.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.1
+  title: Logical Access Controls
+  description: Authorize and protect access to logical assets.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.2
+  title: Registration and Authorization
+  description: Register and authorize users prior to granting access.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.3
+  title: Role-Based Access
+  description: Restrict access based on job responsibilities.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.4
+  title: Physical Access
+  description: Restrict physical access to facilities and assets.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.5
+  title: Physical Access Removal
+  description: Remove physical access when no longer required.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-CC6.6
+  title: Logical Access Security
+  description: Protect against unauthorized access to stored data.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-CC6.7
+  title: Transmission Security
+  description: Protect data during transmission.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-CC6.8
+  title: Malware Prevention
+  description: Prevent or detect and act on malicious software.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC7.1
+  title: System Monitoring
+  description: Monitor infrastructure for operational anomalies.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC7.2
+  title: Vulnerability Management
+  description: Assess vulnerabilities and remediate timely.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC7.3
+  title: Incident Response
+  description: Respond to incidents and execute post-incident reviews.
+  metric_ids:
+  - KRI-MTTD-001
+  - KRI-MTTR-001
+- id: SOC2-CC7.4
+  title: Incident Recovery
+  description: Restore operations and recover from security incidents.
+  metric_ids:
+  - KRI-MTTR-001
+- id: SOC2-CC7.5
+  title: Change Detection
+  description: Detect changes to infrastructure and software.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-CC8.1
+  title: Change Management
+  description: Authorize, design, develop, configure, and deploy changes.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-CC9.1
+  title: Risk Mitigation
+  description: Identify and mitigate risks from business disruptions.
+  metric_ids:
+  - KRI-MTTD-001
+- id: SOC2-CC9.2
+  title: Vendor Risk
+  description: Assess and manage risks associated with vendors.
+  metric_ids:
+  - KRI-CVE-001
+- id: SOC2-P1.1
+  title: Privacy Notice
+  description: Provide notice about privacy practices.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P2.1
+  title: Choice and Consent
+  description: Communicate choices and obtain consent where required.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P3.1
+  title: Collection Limitation
+  description: Collect personal information consistent with objectives.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P4.1
+  title: Use and Retention
+  description: Limit use and retain personal information appropriately.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P5.1
+  title: Access to Personal Information
+  description: Provide access to personal information for review.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-P6.1
+  title: Disclosure to Third Parties
+  description: Disclose personal information to third parties with consent.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P6.7
+  title: Data Loss Prevention
+  description: Ensure transmissions encrypted and sensitive stores monitored.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-P7.1
+  title: Data Quality
+  description: Maintain accurate and complete personal information.
+  metric_ids:
+  - KPI-PHI-001
+- id: SOC2-P8.1
+  title: Monitoring and Enforcement
+  description: Monitor compliance with privacy policies.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-A1.1
+  title: Capacity Planning
+  description: Maintain capacity to meet availability commitments.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-A1.2
+  title: Environmental Protections
+  description: Protect against environmental disruptions.
+  metric_ids:
+  - KRI-MTTD-001
+- id: SOC2-A1.3
+  title: Recovery Testing
+  description: Test recovery procedures for availability.
+  metric_ids:
+  - KRI-MTTR-001
+- id: SOC2-C1.1
+  title: Confidential Information Identification
+  description: Identify and maintain confidential information.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-C1.2
+  title: Confidential Information Disposal
+  description: Dispose of confidential information securely.
+  metric_ids:
+  - KRI-DLP-001
+- id: SOC2-PI1.1
+  title: Processing Integrity — Inputs
+  description: Process inputs completely and accurately.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-PI1.2
+  title: Processing Integrity — Processing
+  description: Processing achieves intended purpose.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-PI1.3
+  title: Processing Integrity — Outputs
+  description: Outputs complete, accurate, and timely.
+  metric_ids:
+  - KPI-FPR-001
+- id: SOC2-PI1.4
+  title: Processing Integrity — Error Handling
+  description: Errors identified and corrected timely.
+  metric_ids:
+  - KRI-MTTD-001
+- id: SOC2-PI1.5
+  title: Processing Integrity — Storage
+  description: Store inputs and outputs completely and accurately.
+  metric_ids:
+  - KRI-DLP-001
