@@ -70,13 +70,13 @@ See the full [CHANGELOG](CHANGELOG.md) for details.
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        PRESENTATION LAYER                          │
+┌───────────────────────────────────────────────────────────────────┐
+│                        PRESENTATION LAYER                         │
 │  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌──────────────────┐  │
-│  │ Dashboard │  │ Trust Ctr │  │ REST API │  │ WebSocket (live) │  │
+│  │ Dashboard │  │ Trust Ctr │  │ REST API │  │ WebSocket (live)│  │
 │  └──────────┘  └───────────┘  └──────────┘  └──────────────────┘  │
 ├─────────────────────────────────────────────────────────────────────┤
-│                        PROCESSING LAYER                            │
+│                        PROCESSING LAYER                           │
 │  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌──────────────────┐  │
 │  │ Metric   │  │ FAIR Risk │  │ RAG      │  │ Compliance       │  │
 │  │ Engine   │  │ Simulator │  │ Classif. │  │ Gap Analyzer     │  │
@@ -86,17 +86,17 @@ See the full [CHANGELOG](CHANGELOG.md) for details.
 │  │ Sim.     │  │ Model     │  │ Vault    │  │ Engine           │  │
 │  └──────────┘  └───────────┘  └──────────┘  └──────────────────┘  │
 ├─────────────────────────────────────────────────────────────────────┤
-│                        INGESTION LAYER                             │
+│                        INGESTION LAYER                            │
 │  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌──────────────────┐  │
 │  │ Elastic  │  │ Splunk    │  │ QRadar   │  │ Azure Sentinel   │  │
 │  └──────────┘  └───────────┘  └──────────┘  └──────────────────┘  │
 ├─────────────────────────────────────────────────────────────────────┤
-│                        DATA LAYER                                  │
+│                        DATA LAYER                                 │
 │  ┌──────────────────┐  ┌────────────┐  ┌──────────────────────┐   │
 │  │ PostgreSQL (prod)│  │ Redis      │  │ SQLite (dev)         │   │
 │  │ + Alembic        │  │ (caching)  │  │                      │   │
 │  └──────────────────┘  └────────────┘  └──────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 **Data Flow:** SIEM connectors → Schema validation → Metric computation → FAIR simulation → RAG classification → Evidence vault → Dashboard + PDF export
