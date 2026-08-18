@@ -12,7 +12,7 @@
 
 **Do not** open public GitHub issues for security vulnerabilities.
 
-Email: **security@valence-grc.io**
+Email: **katuwalmanjil609@gmail.com**
 
 Include:
 - Affected component (API, frontend, auth, tenancy)
