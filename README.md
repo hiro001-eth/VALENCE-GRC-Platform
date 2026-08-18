@@ -163,27 +163,6 @@ Activate your virtual environment, then use the following commands:
 
 ---
 
-## API Surface
-
-VALENCE exposes a comprehensive REST API. Key endpoint groups:
-
-| Group | Endpoints | Description |
-| :--- | :--- | :--- |
-| **Auth** | `/api/auth/*` | Login, token refresh, SSO OIDC, SCIM provisioning |
-| **Metrics** | `/api/metrics/*` | SIEM-derived security metrics and trend data |
-| **Compliance** | `/api/compliance/*` | Framework status, control mapping, gap analysis |
-| **Risk** | `/api/risk/*`, `/api/whatif/*` | FAIR simulation, what-if scenarios |
-| **Breach Sim** | `/api/breach-simulation/*` | Monte Carlo breach impact modeling |
-| **Maturity** | `/api/maturity/*` | Security maturity assessment (CMM L1–L5) |
-| **Evidence** | `/api/evidence/*` | Evidence vault and export packaging |
-| **Findings** | `/api/findings/*` | Security findings with ITSM integration |
-| **Reports** | `/api/reports/*` | PDF generation with cryptographic attestation |
-| **Audit Log** | `/api/audit-log/*` | Tamper-evident activity logging |
-
-Full API documentation: `http://localhost:8000/docs` (interactive Swagger UI with custom theme).
-
----
-
 ## Development
 
 ### Running the Test Suite
