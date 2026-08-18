@@ -3,7 +3,7 @@ import sys
 
 import structlog
 
-VERSION = "1.0.0"
+VERSION = "3.0.0"
 
 def configure_logging(log_level: str = "INFO") -> None:
     """

@@ -59,3 +59,87 @@ metrics:
       - "NIS2_Art21"
     fair_loss_magnitude_usd: 50000.0
     fair_threat_event_frequency: 12.0
+
+  # --- Metrics referenced by framework controls but previously missing definitions ---
+
+  - metric_id: "KRI-MTTR-001"
+    metric_name: "Mean Time to Resolve (MTTR) All Incidents"
+    metric_type: "KRI"
+    formula: "avg(closure_time - creation_time)"
+    data_source: "Splunk:incident_index"
+    unit: "hours"
+    frequency: "hourly"
+    business_owner: "CISO"
+    threshold_config_id: "THRESH-MTTR-V1"
+    regulatory_mappings:
+      - "DORA_ICT_Risk"
+      - "DORA_Incident_Reporting"
+      - "NIS2_Art21"
+      - "SEC_8K"
+    fair_loss_magnitude_usd: 1500000.0  # $1.5M loss exposure per unresolved critical incident
+    fair_threat_event_frequency: 2.0     # 2 critical incidents requiring full response annually
+
+  - metric_id: "KRI-CVE-001"
+    metric_name: "Critical CVE Patch Lag (Days)"
+    metric_type: "KRI"
+    formula: "max(days_since_publish) WHERE severity='critical' AND status='unpatched'"
+    data_source: "Qualys:vuln-scan / Tenable:findings"
+    unit: "days"
+    frequency: "daily"
+    business_owner: "Director of Infrastructure"
+    threshold_config_id: "THRESH-CVE-V1"
+    regulatory_mappings:
+      - "DORA_ICT_Risk"
+      - "NIS2_Art21"
+      - "PCI_DSS_Req6"
+    fair_loss_magnitude_usd: 500000.0   # $500k per exploited unpatched critical CVE
+    fair_threat_event_frequency: 6.0     # 6 critical CVE exploitation attempts annually
+
+  - metric_id: "KRI-DLP-001"
+    metric_name: "Data Loss Prevention Events (Monthly)"
+    metric_type: "KRI"
+    formula: "count(dlp_events) WHERE severity >= 'medium'"
+    data_source: "Elastic:dlp-events-* / Sentinel:SecurityAlert"
+    unit: "count"
+    frequency: "daily"
+    business_owner: "Data Protection Officer"
+    threshold_config_id: "THRESH-DLP-V1"
+    regulatory_mappings:
+      - "GDPR_Art32"
+      - "HIPAA_164.312"
+      - "PCI_DSS_Req3"
+      - "DORA_ICT_Risk"
+    fair_loss_magnitude_usd: 250000.0   # $250k per confirmed data exfiltration event
+    fair_threat_event_frequency: 3.5     # 3.5 material DLP incidents annually
+
+  - metric_id: "KPI-PHI-001"
+    metric_name: "Access Control & PHI Compliance Rate"
+    metric_type: "KPI"
+    formula: "(compliant_access_reviews / total_access_reviews) * 100"
+    data_source: "Okta:system-log / Azure AD:sign-in-logs"
+    unit: "percent"
+    frequency: "daily"
+    business_owner: "CISO"
+    threshold_config_id: "THRESH-PHI-V1"
+    regulatory_mappings:
+      - "HIPAA_164.312"
+      - "GDPR_Art32"
+      - "SOC2_CC6"
+      - "ISO27001_A.9"
+    fair_loss_magnitude_usd: 100000.0   # $100k per access control failure leading to unauthorized access
+    fair_threat_event_frequency: 1.5     # 1.5 access-control-related incidents annually
+
+  - metric_id: "KPI-FPR-001"
+    metric_name: "SOC Alert Quality Rate (Operational FPR)"
+    metric_type: "KPI"
+    formula: "1 - (false_positives / total_alerts)"
+    data_source: "Elastic:soc-alerts-* / Splunk:notable_events"
+    unit: "percent"
+    frequency: "daily"
+    business_owner: "SOC Manager"
+    threshold_config_id: "THRESH-FPR-V2"
+    regulatory_mappings:
+      - "ISO27001_A.16"
+      - "SOC2_CC7"
+    fair_loss_magnitude_usd: 8000.0     # $8k wasted SOC labor per percentage point above baseline
+    fair_threat_event_frequency: 365.0   # Evaluated daily

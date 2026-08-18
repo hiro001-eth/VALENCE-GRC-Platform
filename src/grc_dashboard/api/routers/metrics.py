@@ -1,8 +1,8 @@
 """Metrics router: current state, history, summary."""
-from typing import Annotated, Any
+from typing import Any
 
 import structlog
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 
 from grc_dashboard.api.tenant_context import get_tenant_results
 from grc_dashboard.auth.dependencies import RequireAuditor
@@ -42,6 +42,20 @@ async def get_summary(
         "total_var_95_usd": 0,
         "overall_rag": "NoData",
     })
+
+
+@router.get("/latest")
+async def get_latest_metrics(
+    request: Request,
+    current_user: User = RequireAuditor,
+) -> dict[str, Any]:
+    """Return the latest computed metrics with RAG status and financial risk."""
+    results: dict[str, Any] = get_tenant_results(request)
+    return {
+        "run_id": results.get("run_id", ""),
+        "generated_at": results.get("generated_at", ""),
+        "metrics": results.get("metrics", []),
+    }
 
 
 @router.get("/{metric_id}")

@@ -1,7 +1,6 @@
 """Vendor breach monitoring against public breach intelligence."""
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from typing import Any
 
 import structlog

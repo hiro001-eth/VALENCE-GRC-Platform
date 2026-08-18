@@ -37,7 +37,8 @@ def _jwt_secret() -> str:
 
 
 def _database_url() -> str:
-    return os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./valence.db").strip()
+    from grc_dashboard.config import resolve_database_url
+    return resolve_database_url()
 
 
 def _redis_url() -> str:

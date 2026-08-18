@@ -18,7 +18,6 @@ from grc_dashboard.metrics.metric_engine import MetricEngine
 from grc_dashboard.metrics.trend_analyzer import TrendAnalyzer
 from grc_dashboard.mitre.coverage_mapper import CoverageMapper
 from grc_dashboard.mitre.stix_loader import STIXLoader
-from grc_dashboard.models.audit import DashboardRunMetadata
 from grc_dashboard.models.dashboard import PDFMetadata
 from grc_dashboard.models.metric import MetricDefinition, MetricSnapshot, MetricValue
 from grc_dashboard.models.mitre import DetectionRuleMapping
@@ -56,9 +55,7 @@ def cmd_generate() -> None:
         logger.error("pipeline_failed", run_id=run_id, stage=e.stage_name, error=e.message)
         sys.exit(1)
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        logger.fatal("pipeline_fatal_crash", run_id=run_id, error=str(e))
+        logger.exception("pipeline_fatal_crash", run_id=run_id, error=str(e))
         sys.exit(2)
 
 @app.command("export")

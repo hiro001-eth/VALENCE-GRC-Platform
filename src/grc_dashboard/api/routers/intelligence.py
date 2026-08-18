@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from typing import Annotated, Any
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, HTTPException, Request

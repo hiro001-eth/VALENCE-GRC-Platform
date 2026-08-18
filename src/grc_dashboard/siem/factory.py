@@ -1,8 +1,6 @@
 """SIEM client factory and tenant integration helpers."""
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import AnyHttpUrl, SecretStr
 
 from grc_dashboard.config import Settings, SIEMSettings, get_settings

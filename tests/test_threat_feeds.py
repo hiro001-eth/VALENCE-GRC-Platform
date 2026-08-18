@@ -1,5 +1,4 @@
 """Tests for threat intel feed normalization and benchmarking loader."""
-import pytest
 
 from grc_dashboard.benchmarking.loader import get_industry_benchmarks, load_benchmark_catalog
 from grc_dashboard.threat_intel.feeds import _normalize_kev_entries, correlate_threats

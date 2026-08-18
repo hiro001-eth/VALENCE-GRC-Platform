@@ -50,7 +50,7 @@ def test_login_page_loads(page: Page) -> None:
 def test_demo_login_shows_dashboard(page: Page) -> None:
   page.goto(BASE_URL)
   page.fill("#login-username", "admin")
-  page.fill("#login-password", os.getenv("VALENCE_DEMO_PASSWORD", "ValenceDemo2026!"))
+  page.fill("#login-password", os.getenv("VALENCE_DEMO_PASSWORD", "valence123"))
   page.click("#login-submit")
   page.wait_for_timeout(2000)
   expect(page.locator("#app-shell")).to_be_visible(timeout=15000)

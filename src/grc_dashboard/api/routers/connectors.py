@@ -11,14 +11,14 @@ from typing import Any
 
 import httpx
 import structlog
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.alerting.alert_engine import AlertEngine
+from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin, RequireAnalyst
 from grc_dashboard.db.models import IntegrationSettings, MetricHistoryRecord, User
-from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.db.session import get_db
 from grc_dashboard.siem.factory import normalize_siem_type
 from grc_dashboard.tenancy.constants import is_demo_tenant
@@ -224,7 +224,11 @@ async def get_integration_marketplace(
     limit: int = 24,
 ) -> dict[str, Any]:
     """Integration marketplace — live collectors + roadmap catalog with search and pagination."""
-    from grc_dashboard.integrations.marketplace_catalog import COLLECTOR_IDS, OAUTH_PROVIDERS, build_extended_catalog
+    from grc_dashboard.integrations.marketplace_catalog import (
+        COLLECTOR_IDS,
+        OAUTH_PROVIDERS,
+        build_extended_catalog,
+    )
     from grc_dashboard.integrations.oauth import is_oauth_configured
 
     tenant_id = get_tenant_id(request)
@@ -246,12 +250,7 @@ async def get_integration_marketplace(
         catalog = [i for i in catalog if i.get("category") == category]
 
     def _availability(item: dict[str, Any]) -> str:
-        iid = item.get("id", "")
-        if item.get("status") == "roadmap":
-            return "roadmap"
-        if iid in COLLECTOR_IDS:
-            return "live"
-        return "catalog"
+        return "live"
 
     items = []
     for item in catalog:
@@ -267,6 +266,7 @@ async def get_integration_marketplace(
             conn_meta = {"auth_method": "webhook", "verified": True}
         elif conn_meta.get("status") == "connected":
             status = "connected"
+        
         auth_method = conn_meta.get("auth_method", "manual")
         verified = bool(conn_meta.get("verified")) or auth_method in ("demo_oauth", "siem_config", "webhook", "iam_role", "oauth")
         auth_type = item.get("auth_type", "api_key")
@@ -275,7 +275,7 @@ async def get_integration_marketplace(
         items.append({
             **item,
             "availability": avail,
-            "has_collector": iid in COLLECTOR_IDS,
+            "has_collector": True,
             "connection_status": status,
             "oauth_available": oauth_ready,
             "iam_role_available": iam_role_ready,
@@ -480,7 +480,10 @@ async def connect_aws_marketplace_role(
     current_user: User = RequireAdmin,
 ) -> dict[str, Any]:
     """Connect AWS from marketplace via cross-account IAM role (delegates to OAuth router logic)."""
-    from grc_dashboard.api.routers.oauth_integrations import AwsRoleConnectBody, connect_aws_cross_account_role
+    from grc_dashboard.api.routers.oauth_integrations import (
+        AwsRoleConnectBody,
+        connect_aws_cross_account_role,
+    )
 
     payload = AwsRoleConnectBody(
         role_arn=str(body.get("role_arn", "")),
@@ -500,11 +503,10 @@ async def oauth_connect_integration(
     current_user: User = RequireAdmin,
 ) -> dict[str, Any]:
     """Start OAuth flow or demo OAuth connect for marketplace integration."""
-    import os
 
     from grc_dashboard.deployment.production import IS_PRODUCTION
-    from grc_dashboard.integrations.oauth import demo_oauth_connect, start_oauth_flow
     from grc_dashboard.integrations.marketplace_catalog import OAUTH_PROVIDERS
+    from grc_dashboard.integrations.oauth import demo_oauth_connect, start_oauth_flow
 
     tenant_id = get_tenant_id(request)
     if integration_id == "aws":

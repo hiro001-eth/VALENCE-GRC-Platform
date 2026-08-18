@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import re
-import secrets
 from typing import Any
 
 import structlog
@@ -10,12 +9,11 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.auth.jwt_handler import hash_password
 from grc_dashboard.auth.features import allowed_feature_list
+from grc_dashboard.auth.jwt_handler import hash_password
 from grc_dashboard.db.models import Tenant, User
 from grc_dashboard.tenancy.constants import (
     DEMO_TENANT_IDS,
-    DEMO_USERNAMES,
     is_demo_tenant,
     is_demo_username,
     normalize_tenant_id,

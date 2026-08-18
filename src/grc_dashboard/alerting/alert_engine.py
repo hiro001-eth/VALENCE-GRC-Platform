@@ -1,14 +1,12 @@
-from datetime import UTC, datetime
 from typing import Any
 
 import structlog
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.alerting.email_notifier import EmailNotifier
+from grc_dashboard.alerting.pagerduty_notifier import PagerDutyNotifier
 from grc_dashboard.alerting.slack_notifier import SlackNotifier
 from grc_dashboard.alerting.teams_notifier import TeamsNotifier
-from grc_dashboard.alerting.pagerduty_notifier import PagerDutyNotifier
 from grc_dashboard.db.models import AlertRecord, IntegrationSettings
 from grc_dashboard.db.session import AsyncSessionLocal
 
@@ -34,7 +32,7 @@ class AlertEngine:
             # Safely extract from either model or dict
             first_m = metrics[0]
             if hasattr(first_m, "tenant_id"):
-                tenant_id = getattr(first_m, "tenant_id")
+                tenant_id = first_m.tenant_id
             elif isinstance(first_m, dict):
                 tenant_id = first_m.get("tenant_id", "default")
 

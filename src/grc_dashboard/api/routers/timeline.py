@@ -4,10 +4,8 @@ Visual timeline showing how the organization's security posture evolved
 over time. Users can scrub backward and see RAG transitions, compliance
 impacts, and metric trends. Essential for SOC2 Type II audit evidence.
 """
-import json
 import random
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Annotated, Any
 
 import structlog
@@ -17,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import require_feature
 from grc_dashboard.db.models import User
-from grc_dashboard.db.persistence import list_timeline, save_timeline_snapshot
+from grc_dashboard.db.persistence import list_timeline
 from grc_dashboard.db.session import get_db
 from grc_dashboard.tenancy.constants import is_demo_tenant
 from grc_dashboard.timeline.events import demo_security_events

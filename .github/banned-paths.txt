@@ -1,4 +1,7 @@
 # Banned from public repository — see docs/adr/0008-repository-publication-boundaries.md
+# CI enforces: any PR touching these paths is automatically rejected.
+
+# --- Media & recordings ---
 *.mp4
 *.mov
 *.webm
@@ -9,11 +12,16 @@ demo_record.log
 advance_demo_record.log
 .demo_video_tmp/
 .advance_demo_tmp/
+
+# --- Internal planning ---
 docs/PRODUCT_ROADMAP.md
 docs/LAUNCH_READINESS.md
+docs/project_playbook.*
 annotated_file_structure.md
 research_synthesis_report.md
 ADR.md
+
+# --- Secrets & runtime state ---
 .env
 .env.local
 .env.production
@@ -22,3 +30,26 @@ data/demo_credentials.json
 valence.db
 .valence-api.pid
 .coverage
+
+# --- TLS certificates & private keys ---
+certs/
+*.key
+*.pem
+*.p12
+
+# --- AI-generated / presentation documents ---
+VALENCE_ENTERPRISE_BLUEPRINT*.md
+VALENCE_ENTERPRISE_CISO_PLAYBOOK*
+VALENCE_CISO_Presentation*.html
+VALENCE_INTERACTIVE_PRESENTATION*.html
+VALENCE_GRAPHICAL_PRESENTATION_DECK*.md
+generate_playbook.py
+
+# --- Development screenshots ---
+Risk_Simulator_Curve*.png
+architecture_diagram_*.png
+dashboard_mockup_*.png
+evidence_chain_*.png
+dashboard-threat-layout.png
+landing-*-refresh.png
+playwright-*.png

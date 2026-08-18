@@ -191,3 +191,65 @@ Run `./scripts/validate_production.sh` after copying `.env.production.example` �
 - [ ] SMTP env vars set for scheduled reports
 - [ ] SOC 2 control matrix reviewed (`docs/compliance/SOC2_CONTROL_MATRIX.md`)
 
+
+## 11. SCIM User Provisioning (Okta / Azure AD)
+
+VALENCE supports SCIM 2.0 user provisioning via the `/api/scim/v2` endpoints.
+
+### Development Mode Behavior
+By default in local development/sandbox environments, if the `SCIM_BEARER_TOKEN` environment variable is not set, SCIM endpoints will return `503 Service Unavailable` with a detail message indicating that SCIM is not configured. This is the expected behavior and acts as a security safeguard.
+
+### Configuring SCIM Provisioning
+To enable and configure SCIM provisioning for Okta or Azure AD:
+1. Generate a long, secure random token to be used as the SCIM bearer token.
+2. In your `.env` file, set the following environment variables:
+   ```bash
+   SCIM_BEARER_TOKEN=your-secure-random-token
+   SCIM_DEFAULT_TENANT_ID=demo-global-hq
+   ```
+3. Set the `X-VALENCE-Tenant-ID` header in your Identity Provider (IdP) SCIM client configuration, or rely on `SCIM_DEFAULT_TENANT_ID` if it is a single-tenant deployment.
+4. Okta/Azure AD will authenticate requests using `Authorization: Bearer <your-secure-random-token>`.
+
+
+## 12. EU Data Residency and Regulatory Compliance (DORA/NIS2)
+
+To satisfy the strict local data residency requirements under DORA and NIS2 regulations, VALENCE supports dynamic data residency routing for PostgreSQL.
+
+### Configuration Flags
+
+Set the following environment variables in your deployment's `.env` configuration:
+
+- `VALENCE_DATA_RESIDENCY`: Set to `EU` to activate data residency constraints (defaults to `US`).
+- `DATABASE_URL_EU`: The target PostgreSQL connection string for the EU-hosted database cluster (e.g., `postgresql+asyncpg://valence_admin:ProdPasswordEU@db-eu-cluster.internal:5432/valence_prod`). If `VALENCE_DATA_RESIDENCY` is set to `EU`, the application dynamically routes all database migrations, reads, and writes to this endpoint.
+
+
+## 13. Microsoft Sentinel (Azure Log Analytics) Live Integration
+
+To connect VALENCE to a live Microsoft Sentinel/Log Analytics workspace, follow the setup process below.
+
+### 1. Azure Active Directory (Microsoft Entra ID) App Registration
+1. In the Azure portal, navigate to **Microsoft Entra ID** → **App registrations** → **New registration**.
+2. Name the application (e.g., `Valence-Sentinel-Connector`), choose single-tenant, and click **Register**.
+3. Copy the **Application (client) ID** and **Directory (tenant) ID** from the App Registration overview screen.
+4. Navigate to **Certificates & secrets** → **Client secrets** → **New client secret**. Copy the generated secret value immediately.
+
+### 2. Granting Workspace Access
+1. Navigate to your **Log Analytics workspace** (backing Microsoft Sentinel).
+2. Go to **Access control (IAM)** → **Add** → **Add role assignment**.
+3. Select the **Log Analytics Reader** role.
+4. Under members, choose **User, group, or service principal** and select the registered App name (e.g., `Valence-Sentinel-Connector`).
+5. Click **Review + assign**.
+
+### 3. VALENCE Environment Configuration
+Add the following configuration keys to your `.env` file:
+```bash
+# Microsoft Sentinel Credentials
+SENTINEL_WORKSPACE_ID="<your-log-analytics-workspace-guid>"
+SENTINEL_TENANT_ID="<your-azure-tenant-guid>"
+SENTINEL_CLIENT_ID="<your-app-registration-client-guid>"
+SENTINEL_CLIENT_SECRET="<your-app-registration-client-secret-value>"
+```
+
+### 4. Verification
+Test the connection via the VALENCE API or connectors dashboard by requesting a verification check against `sentinel`. If credentials are valid, the connector will return a status of `healthy` and query logs using Azure's Log Analytics KQL API.
+

@@ -1,4 +1,3 @@
-import json
 import os
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
@@ -7,7 +6,7 @@ from typing import Any
 import aiohttp
 import structlog
 
-from grc_dashboard.exceptions import SIEMAuthenticationException, SIEMQueryException
+from grc_dashboard.exceptions import SIEMAuthenticationException
 from grc_dashboard.models.siem import SIEMQuery
 from grc_dashboard.siem.siem_client import SIEMClient
 from grc_dashboard.utils.retry_utils import async_retry_with_backoff

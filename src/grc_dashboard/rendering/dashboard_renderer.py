@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any
 
 import structlog
 from jinja2 import Environment, FileSystemLoader
@@ -31,14 +31,14 @@ class DashboardRenderer:
 
     def render(
         self, 
-        metrics: List[MetricValue], 
-        rag_assignments: List[RAGAssignment], 
-        trends: List[TrendDelta], 
+        metrics: list[MetricValue], 
+        rag_assignments: list[RAGAssignment], 
+        trends: list[TrendDelta], 
         coverage: CoverageMatrix,
         run_id: str,
         snapshot_hash: str,
-        narratives: Optional[dict[str, Any]] = None, # map of metric_id to narrative string
-        tickets: Optional[dict[str, Any]] = None     # map of metric_id to ITSM ticket ID
+        narratives: dict[str, Any] | None = None, # map of metric_id to narrative string
+        tickets: dict[str, Any] | None = None     # map of metric_id to ITSM ticket ID
     ) -> DashboardArtifact:
         try:
             narratives = narratives or {}
@@ -82,12 +82,12 @@ class DashboardRenderer:
 
     def _build_rag_cards(
         self, 
-        metrics: List[MetricValue], 
-        rag_assignments: List[RAGAssignment], 
-        trends: List[TrendDelta],
+        metrics: list[MetricValue], 
+        rag_assignments: list[RAGAssignment], 
+        trends: list[TrendDelta],
         narratives: dict[str, Any],
         tickets: dict[str, Any]
-    ) -> List[DashboardCard]:
+    ) -> list[DashboardCard]:
         rag_map = {r.metric_id: r for r in rag_assignments}
         trend_map = {t.metric_id: t for t in trends}
         

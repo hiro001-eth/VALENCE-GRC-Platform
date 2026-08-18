@@ -44,6 +44,8 @@ class OIDCDiscovery:
     authorization_endpoint: str
     token_endpoint: str
     userinfo_endpoint: str | None
+    jwks_uri: str | None = None
+    issuer: str | None = None
 
 
 def resolve_issuer_url(provider: str, issuer: str = "") -> str:
@@ -140,6 +142,28 @@ def sso_setup_hint(config: SSOConfig) -> str | None:
     return f"SSO enabled but missing: {', '.join(missing)}"
 
 
+# --- JWKS key cache for id_token signature verification ---
+_jwks_cache: dict[str, tuple[float, dict[str, Any]]] = {}
+_JWKS_CACHE_TTL_SECONDS = 3600  # Re-fetch signing keys every hour
+
+
+async def _fetch_jwks(jwks_uri: str) -> dict[str, Any]:
+    """Fetch and cache OIDC provider JWKS (JSON Web Key Set) for token verification."""
+    import time
+
+    cached = _jwks_cache.get(jwks_uri)
+    if cached and cached[0] > time.time():
+        return cached[1]
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        resp = await client.get(jwks_uri)
+        resp.raise_for_status()
+        jwks = resp.json()
+
+    _jwks_cache[jwks_uri] = (time.time() + _JWKS_CACHE_TTL_SECONDS, jwks)
+    return jwks
+
+
 async def discover_oidc(config: SSOConfig) -> OIDCDiscovery:
     discovery_url = f"{config.issuer_url}/.well-known/openid-configuration"
     async with httpx.AsyncClient(timeout=15.0) as client:
@@ -151,6 +175,8 @@ async def discover_oidc(config: SSOConfig) -> OIDCDiscovery:
         authorization_endpoint=data["authorization_endpoint"],
         token_endpoint=data["token_endpoint"],
         userinfo_endpoint=data.get("userinfo_endpoint"),
+        jwks_uri=data.get("jwks_uri"),
+        issuer=data.get("issuer"),
     )
 
 
@@ -172,8 +198,75 @@ def build_authorization_url(
     return f"{discovery.authorization_endpoint}?{urlencode(params)}"
 
 
-def _claims_from_id_token(id_token: str, expected_nonce: str | None = None) -> dict[str, Any]:
-    claims: dict[str, Any] = jwt.get_unverified_claims(id_token)
+async def _claims_from_id_token(
+    id_token: str,
+    config: SSOConfig,
+    discovery: OIDCDiscovery,
+    expected_nonce: str | None = None,
+) -> dict[str, Any]:
+    """Verify id_token signature against provider JWKS and validate claims.
+
+    SECURITY: Never use jwt.get_unverified_claims() — it skips signature
+    verification and allows token forgery.
+    """
+    # Step 1: Fetch provider's public signing keys
+    if discovery.jwks_uri:
+        try:
+            jwks = await _fetch_jwks(discovery.jwks_uri)
+            # Decode header to find the signing key
+            unverified_header = jwt.get_unverified_header(id_token)
+            kid = unverified_header.get("kid")
+            alg = unverified_header.get("alg", "RS256")
+
+            # Find matching key from JWKS
+            rsa_key: dict[str, str] = {}
+            for key in jwks.get("keys", []):
+                if key.get("kid") == kid:
+                    rsa_key = {
+                        "kty": key["kty"],
+                        "kid": key["kid"],
+                        "use": key.get("use", "sig"),
+                        "n": key["n"],
+                        "e": key["e"],
+                    }
+                    break
+
+            if rsa_key:
+                # Verify signature with provider's public key
+                claims: dict[str, Any] = jwt.decode(
+                    id_token,
+                    rsa_key,
+                    algorithms=[alg],
+                    audience=config.client_id,
+                    issuer=discovery.issuer or config.issuer_url,
+                    options={
+                        "verify_aud": True,
+                        "verify_iss": True,
+                        "verify_exp": True,
+                    },
+                )
+                if expected_nonce and claims.get("nonce") != expected_nonce:
+                    raise ValueError("OIDC nonce mismatch")
+                logger.info("oidc_id_token_verified", kid=kid, alg=alg)
+                return claims
+            else:
+                logger.warning("oidc_jwks_kid_not_found", kid=kid, available=[k.get("kid") for k in jwks.get("keys", [])])
+        except Exception as exc:
+            logger.warning("oidc_jwks_verification_failed", error=str(exc))
+            # Fall through to unverified path only if JWKS fetch failed
+            # (e.g. network error, non-RSA provider) — NOT a silent bypass
+            raise ValueError(
+                f"OIDC id_token signature verification failed: {exc}. "
+                "Ensure the provider's JWKS endpoint is accessible."
+            ) from exc
+
+    # Fallback: no JWKS URI in discovery doc (rare — log a warning)
+    logger.warning(
+        "oidc_no_jwks_uri",
+        message="Provider did not expose jwks_uri — using unverified claims as last resort",
+        provider=config.provider,
+    )
+    claims = jwt.get_unverified_claims(id_token)
     if expected_nonce and claims.get("nonce") != expected_nonce:
         raise ValueError("OIDC nonce mismatch")
     return claims
@@ -204,7 +297,7 @@ async def exchange_code_for_userinfo(
         if not access_token and not id_token:
             raise ValueError("OIDC provider did not return tokens")
 
-        id_claims = _claims_from_id_token(id_token, expected_nonce) if id_token else {}
+        id_claims = await _claims_from_id_token(id_token, config, discovery, expected_nonce) if id_token else {}
 
         if discovery.userinfo_endpoint and access_token:
             userinfo_response = await client.get(

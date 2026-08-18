@@ -4,10 +4,9 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin
 from grc_dashboard.db.models import IntegrationSettings, Tenant, User
 from grc_dashboard.db.session import get_db

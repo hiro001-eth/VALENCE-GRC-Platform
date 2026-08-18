@@ -1,13 +1,21 @@
-from pathlib import Path
 import sqlite3
+from datetime import UTC, datetime
+from pathlib import Path
+
 import structlog
-from datetime import datetime, UTC
 
 try:
-    from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.platypus import (
+        PageBreak,
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+        Table,
+        TableStyle,
+    )
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
@@ -86,36 +94,64 @@ class PDFGenerator:
             run_id = metadata.dashboard_run_id
             pdf_path = artifact.pdf_path
 
-            # Fetch metrics & findings from SQLite database
+            # Fetch metrics & findings from Database
             metrics = []
             findings = []
             tenant_id = "default"
             try:
-                # Open connection to local DB synchronously
-                conn = sqlite3.connect("valence.db")
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT metric_id, metric_name, value, rag_status, ale_usd, var_95_usd, probability_of_breach FROM metric_history WHERE run_id = ?",
-                    (run_id,)
-                )
-                metrics = [dict(row) for row in cursor.fetchall()]
-                
-                if metrics:
-                    tenant_id = metrics[0].get("tenant_id", "default")
-                else:
-                    # Fallback lookup by latest entries in db
-                    cursor.execute("SELECT tenant_id FROM metric_history ORDER BY id DESC LIMIT 1")
-                    res = cursor.fetchone()
-                    if res:
-                        tenant_id = res["tenant_id"]
+                from sqlalchemy import create_engine, text
 
-                cursor.execute(
-                    "SELECT id, title, description, severity, status, owner_username FROM audit_findings WHERE tenant_id = ?",
-                    (tenant_id,)
-                )
-                findings = [dict(row) for row in cursor.fetchall()]
-                conn.close()
+                from grc_dashboard.config import resolve_database_url
+                db_url = resolve_database_url()
+                if "sqlite" in db_url:
+                    clean_path = db_url.split(":///")[-1]
+                    conn = sqlite3.connect(clean_path)
+                    conn.row_factory = sqlite3.Row
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "SELECT metric_id, metric_name, value, rag_status, ale_usd, var_95_usd, probability_of_breach FROM metric_history WHERE run_id = ?",
+                        (run_id,)
+                    )
+                    metrics = [dict(row) for row in cursor.fetchall()]
+                    
+                    if metrics:
+                        tenant_id = metrics[0].get("tenant_id", "default")
+                    else:
+                        cursor.execute("SELECT tenant_id FROM metric_history ORDER BY id DESC LIMIT 1")
+                        res = cursor.fetchone()
+                        if res:
+                            tenant_id = res["tenant_id"]
+
+                    cursor.execute(
+                        "SELECT id, title, description, severity, status, owner_username FROM audit_findings WHERE tenant_id = ?",
+                        (tenant_id,)
+                    )
+                    findings = [dict(row) for row in cursor.fetchall()]
+                    conn.close()
+                else:
+                    sync_db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
+                    sync_engine = create_engine(sync_db_url)
+                    with sync_engine.connect() as conn:
+                        res_metrics = conn.execute(
+                            text("SELECT metric_id, metric_name, value, rag_status, ale_usd, var_95_usd, probability_of_breach, tenant_id FROM metric_history WHERE run_id = :run_id"),
+                            {"run_id": run_id}
+                        ).fetchall()
+                        metrics = [dict(row._mapping) for row in res_metrics]
+                        
+                        if metrics:
+                            tenant_id = metrics[0].get("tenant_id", "default")
+                        else:
+                            res_tenant = conn.execute(
+                                text("SELECT tenant_id FROM metric_history ORDER BY id DESC LIMIT 1")
+                            ).first()
+                            if res_tenant:
+                                tenant_id = res_tenant[0]
+                                
+                        res_findings = conn.execute(
+                            text("SELECT id, title, description, severity, status, owner_username FROM audit_findings WHERE tenant_id = :tenant_id"),
+                            {"tenant_id": tenant_id}
+                        ).fetchall()
+                        findings = [dict(row._mapping) for row in res_findings]
             except Exception as db_err:
                 logger.warning("pdf_db_query_failed_using_demo_fallbacks", error=str(db_err))
 

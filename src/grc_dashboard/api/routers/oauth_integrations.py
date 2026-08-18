@@ -1,6 +1,7 @@
 """OAuth marketplace integration routes."""
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 import httpx
@@ -9,8 +10,6 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from datetime import UTC, datetime
 
 from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin

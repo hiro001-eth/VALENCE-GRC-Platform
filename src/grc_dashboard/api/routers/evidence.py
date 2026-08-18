@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Any
 
 import structlog
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.api.tenant_context import get_tenant_id
@@ -45,10 +45,10 @@ async def get_evidence_vault(
     display = filtered[-limit:]
 
     chain_valid = True
-    for i, record in enumerate(display):
+    for i, record in enumerate(records):
         if i == 0:
             continue
-        if record.get("previous_hash") != display[i - 1].get("hash"):
+        if record.get("previous_hash") != records[i - 1].get("hash"):
             chain_valid = False
             break
 
@@ -127,8 +127,9 @@ async def export_evidence_pack(
     request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     framework: str = "SOC2",
+    format: str = "json",
     current_user: User = RequireAuditor,
-) -> dict[str, Any]:
+) -> Any:
     """Generate a Continuous Monitoring Evidence Pack for audit submission."""
     tenant_id = get_tenant_id(request)
     now = datetime.now(UTC)
@@ -155,6 +156,30 @@ async def export_evidence_pack(
         if r.get("category") in relevant_categories
         or (r.get("data") or {}).get("framework", "").upper() == fw_upper
     ]
+
+    if format.lower() == "csv":
+        import csv
+        import io
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["Evidence ID", "Timestamp", "Category", "Event Type", "Hash", "Previous Hash"])
+        for r in relevant_records:
+            writer.writerow([
+                r.get("evidence_id", ""),
+                r.get("timestamp", ""),
+                r.get("category", ""),
+                r.get("event_type", ""),
+                r.get("hash", ""),
+                r.get("previous_hash", "")
+            ])
+            
+        csv_content = output.getvalue()
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="evidence_pack_{fw_upper}_{pack_id}.csv"'}
+        )
 
     return {
         "pack_id": pack_id,

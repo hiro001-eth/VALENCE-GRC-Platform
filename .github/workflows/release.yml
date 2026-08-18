@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: "pip"
+
+    - name: Install dependencies
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        uv venv
+        source .venv/bin/activate
+        uv pip install -e ".[dev,test]"
+
+    - name: Run tests
+      run: |
+        source .venv/bin/activate
+        pytest tests/ -q
+
+    - name: Repository boundary check (ADR-0008)
+      run: ./scripts/verify_public_repo.sh
+
+    - name: Build distribution
+      run: |
+        source .venv/bin/activate
+        uv pip install build
+        python -m build
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "VALENCE v${{ steps.version.outputs.VERSION }}"
+        body_path: CHANGELOG.md
+        draft: false
+        prerelease: false
+        files: |
+          dist/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t valence-grc-api:${{ steps.version.outputs.VERSION }} .
+        docker tag valence-grc-api:${{ steps.version.outputs.VERSION }} valence-grc-api:latest

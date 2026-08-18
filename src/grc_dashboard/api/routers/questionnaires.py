@@ -188,8 +188,9 @@ async def auto_fill_questionnaire(
 
 @router.get("/library")
 async def questionnaire_library(current_user: User = RequireAuditor) -> dict[str, Any]:
-    from grc_dashboard.intelligence.questionnaire_ai import QUESTIONNAIRE_LIBRARY
     import os
+
+    from grc_dashboard.intelligence.questionnaire_ai import QUESTIONNAIRE_LIBRARY
     return {
         "templates": [
             {"id": tid, **meta}
@@ -214,7 +215,11 @@ async def ai_draft_questionnaire(
 ) -> dict[str, Any]:
     """Vanta-scale AI questionnaire drafting — SIG, CAIQ, SOC2, ISO, NIST, HIPAA, PCI."""
     import os
-    from grc_dashboard.intelligence.questionnaire_ai import QUESTIONNAIRE_LIBRARY, draft_questionnaire_answers
+
+    from grc_dashboard.intelligence.questionnaire_ai import (
+        QUESTIONNAIRE_LIBRARY,
+        draft_questionnaire_answers,
+    )
 
     tenant_id = get_tenant_id(request)
     results = get_tenant_results(request)

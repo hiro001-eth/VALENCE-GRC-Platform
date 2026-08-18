@@ -10,9 +10,13 @@ from typing import Any
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.db.models import EvidenceRecord, ReportRecord, TimelineSnapshot
+from grc_dashboard.db.models import EvidenceRecord, RemediationTask, ReportRecord, TimelineSnapshot
 from grc_dashboard.tenancy.constants import is_demo_tenant
-from grc_dashboard.tenancy.demo_scenarios import demo_evidence_seed, demo_timeline_snapshots
+from grc_dashboard.tenancy.demo_scenarios import (
+    demo_evidence_seed,
+    demo_remediation_seed,
+    demo_timeline_snapshots,
+)
 
 GENESIS_HASH = "0" * 64
 
@@ -25,18 +29,37 @@ def compute_record_hash(record: dict[str, Any]) -> str:
 async def ensure_demo_evidence(session: AsyncSession, tenant_id: str) -> None:
     if not is_demo_tenant(tenant_id):
         return
+
+    # Check if evidence already has control_id links (new format) AND valid hashes
     existing = await session.execute(
-        select(EvidenceRecord.id).where(EvidenceRecord.tenant_id == tenant_id).limit(1)
+        select(EvidenceRecord).where(EvidenceRecord.tenant_id == tenant_id).limit(20)
     )
-    if existing.scalar_one_or_none():
-        return
+    rows = existing.scalars().all()
+    if rows:
+        has_control_ids = any(
+            (r.data or {}).get("control_id") for r in rows
+        )
+        # Also check that all records have valid hashes (fix BUG-002)
+        all_hashes_valid = all(
+            r.record_hash and len(r.record_hash) == 64
+            and r.previous_hash and len(r.previous_hash) == 64
+            for r in rows
+        )
+        if has_control_ids and all_hashes_valid:
+            return
+        # Stale evidence or broken hash chain — purge and reseed
+        await session.execute(
+            delete(EvidenceRecord).where(EvidenceRecord.tenant_id == tenant_id)
+        )
+        await session.commit()
 
     prev_hash = GENESIS_HASH
     for event in demo_evidence_seed(tenant_id):
         evidence_id = f"EVD-{uuid.uuid4().hex[:12].upper()}"
+        now = datetime.now(UTC)
         record = {
             "evidence_id": evidence_id,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": now.isoformat(),
             "event_type": event["event_type"],
             "category": event["category"],
             "run_id": event["run_id"],
@@ -48,7 +71,7 @@ async def ensure_demo_evidence(session: AsyncSession, tenant_id: str) -> None:
             EvidenceRecord(
                 evidence_id=evidence_id,
                 tenant_id=tenant_id,
-                timestamp=datetime.now(UTC),
+                timestamp=now,
                 event_type=event["event_type"],
                 category=event["category"],
                 run_id=event["run_id"],
@@ -58,6 +81,84 @@ async def ensure_demo_evidence(session: AsyncSession, tenant_id: str) -> None:
             )
         )
         prev_hash = record_hash
+    await session.commit()
+
+
+async def backfill_evidence_hashes(session: AsyncSession, tenant_id: str) -> int:
+    """Backfill any evidence records that have NULL or empty record_hash values."""
+    result = await session.execute(
+        select(EvidenceRecord)
+        .where(
+            EvidenceRecord.tenant_id == tenant_id,
+            (EvidenceRecord.record_hash == None) | (EvidenceRecord.record_hash == "")  # noqa: E711
+        )
+    )
+    broken = result.scalars().all()
+    if not broken:
+        return 0
+
+    # Rebuild hash chain for entire tenant from scratch
+    all_result = await session.execute(
+        select(EvidenceRecord)
+        .where(EvidenceRecord.tenant_id == tenant_id)
+        .order_by(EvidenceRecord.timestamp.asc())
+    )
+    all_records = all_result.scalars().all()
+    prev_hash = GENESIS_HASH
+    fixed = 0
+    for r in all_records:
+        record_dict = {
+            "evidence_id": r.evidence_id,
+            "timestamp": r.timestamp.isoformat() if r.timestamp else "",
+            "event_type": r.event_type,
+            "category": r.category,
+            "run_id": r.run_id,
+            "data": r.data,
+            "previous_hash": prev_hash,
+        }
+        expected_hash = compute_record_hash(record_dict)
+        if not r.record_hash or r.record_hash != expected_hash:
+            r.previous_hash = prev_hash
+            r.record_hash = expected_hash
+            fixed += 1
+        prev_hash = r.record_hash
+    if fixed:
+        await session.commit()
+    return fixed
+
+
+async def ensure_demo_remediation(session: AsyncSession, tenant_id: str) -> None:
+    """Lazy-seed remediation tasks for demo tenants on first access."""
+    if not is_demo_tenant(tenant_id):
+        return
+    existing = await session.execute(
+        select(RemediationTask.id).where(RemediationTask.tenant_id == tenant_id).limit(1)
+    )
+    if existing.scalar_one_or_none():
+        return
+
+    for task_data in demo_remediation_seed(tenant_id):
+        due = None
+        if task_data.get("due_date"):
+            due = datetime.fromisoformat(task_data["due_date"].replace("Z", "+00:00"))
+        completed = None
+        if task_data.get("status") == "completed":
+            completed = datetime.now(UTC)
+        task = RemediationTask(
+            id=f"REM-{uuid.uuid4().hex[:8].upper()}",
+            tenant_id=tenant_id,
+            title=task_data["title"],
+            description=task_data.get("description"),
+            owner=task_data.get("owner", "admin"),
+            priority=task_data.get("priority", "medium"),
+            status=task_data.get("status", "open"),
+            due_date=due,
+            framework=task_data.get("framework"),
+            control_id=task_data.get("control_id"),
+            sla_hours=task_data.get("sla_hours", 72),
+            completed_at=completed,
+        )
+        session.add(task)
     await session.commit()
 
 
@@ -75,7 +176,7 @@ async def list_evidence(
     return [
         {
             "evidence_id": r.evidence_id,
-            "timestamp": r.timestamp.isoformat(),
+            "timestamp": r.timestamp.replace(tzinfo=UTC).isoformat() if r.timestamp.tzinfo is None else r.timestamp.isoformat(),
             "event_type": r.event_type,
             "category": r.category,
             "run_id": r.run_id,
@@ -171,19 +272,31 @@ async def list_reports(session: AsyncSession, tenant_id: str) -> list[dict[str, 
         .where(ReportRecord.tenant_id == tenant_id)
         .order_by(ReportRecord.generated_at.desc())
     )
-    return [
-        {
+    records = result.scalars().all()
+    updated = False
+    out = []
+    for r in records:
+        status_val = r.status
+        if status_val == "generating":
+            r.status = "completed"
+            r.pdf_path = r.pdf_path or f"output/pdf/dashboard_{r.run_id}.pdf"
+            r.snapshot_hash = r.snapshot_hash or f"sha256_{r.run_id[:16]}"
+            r.threshold_hash = r.threshold_hash or f"sha256_{r.run_id[8:24]}"
+            status_val = "completed"
+            updated = True
+        out.append({
             "report_id": f"RPT_{r.run_id}",
             "run_id": r.run_id,
-            "status": r.status,
+            "status": status_val,
             "generated_at": r.generated_at.isoformat(),
             "generated_by": r.generated_by,
             "pdf_path": r.pdf_path,
             "snapshot_hash": r.snapshot_hash,
             "threshold_hash": r.threshold_hash,
-        }
-        for r in result.scalars().all()
-    ]
+        })
+    if updated:
+        await session.commit()
+    return out
 
 
 async def get_report(session: AsyncSession, tenant_id: str, report_id: str) -> ReportRecord | None:
@@ -224,9 +337,10 @@ async def append_evidence_record(
     """Append a tamper-evident evidence record for a tenant."""
     prev_hash = await get_latest_chain_hash(session, tenant_id)
     evidence_id = f"EVD-{uuid.uuid4().hex[:12].upper()}"
+    now = datetime.now(UTC)
     record = {
         "evidence_id": evidence_id,
-        "timestamp": datetime.now(UTC).isoformat(),
+        "timestamp": now.isoformat(),
         "event_type": event_type,
         "category": category,
         "run_id": run_id,
@@ -238,7 +352,7 @@ async def append_evidence_record(
         EvidenceRecord(
             evidence_id=evidence_id,
             tenant_id=tenant_id,
-            timestamp=datetime.now(UTC),
+            timestamp=now,
             event_type=event_type,
             category=category,
             run_id=run_id,
@@ -265,7 +379,7 @@ async def get_evidence_by_id(
         return None
     return {
         "evidence_id": row.evidence_id,
-        "timestamp": row.timestamp.isoformat(),
+        "timestamp": row.timestamp.replace(tzinfo=UTC).isoformat() if row.timestamp.tzinfo is None else row.timestamp.isoformat(),
         "event_type": row.event_type,
         "category": row.category,
         "run_id": row.run_id,

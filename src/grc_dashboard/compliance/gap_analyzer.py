@@ -2,7 +2,7 @@ from typing import Any
 
 import structlog
 
-from grc_dashboard.compliance.framework_loader import ComplianceFrameworkRule, FrameworkLoader
+from grc_dashboard.compliance.framework_loader import FrameworkLoader
 
 logger = structlog.get_logger(__name__)
 

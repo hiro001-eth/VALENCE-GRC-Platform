@@ -1,7 +1,5 @@
-import asyncio
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
 
 from grc_dashboard.api.main import app
 from grc_dashboard.db.session import init_db

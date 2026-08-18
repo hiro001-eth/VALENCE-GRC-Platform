@@ -1,26 +1,86 @@
-
 <!DOCTYPE html>
 <html>
-<head><title>{{ title }}</title><script src="https://cdn.plot.ly/plotly-latest.min.js"></script></head>
+
+<head>
+    <title>{{ title }}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
 <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f9fafb; color: #111827; margin: 2rem; }
-    .card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .status-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.875rem; }
-    .status-Red { background: #fee2e2; color: #991b1b; }
-    .status-Amber { background: #fef3c7; color: #92400e; }
-    .status-Green { background: #d1fae5; color: #065f46; }
-    .narrative { background: #f3f4f6; padding: 1rem; border-left: 4px solid #3b82f6; margin-top: 1rem; font-style: italic; }
-    .ticket { margin-top: 0.5rem; font-size: 0.875rem; font-weight: bold; color: #dc2626; }
-    .risk-box { margin: 0.75rem 0; font-size: 0.9rem; background: #eff6ff; padding: 0.75rem; border-radius: 6px; border: 1px dashed #bfdbfe; color: #1e40af; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #f9fafb;
+        color: #111827;
+        margin: 2rem;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.875rem;
+    }
+
+    .status-Red {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-Amber {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-Green {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .narrative {
+        background: #f3f4f6;
+        padding: 1rem;
+        border-left: 4px solid #3b82f6;
+        margin-top: 1rem;
+        font-style: italic;
+    }
+
+    .ticket {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: bold;
+        color: #dc2626;
+    }
+
+    .risk-box {
+        margin: 0.75rem 0;
+        font-size: 0.9rem;
+        background: #eff6ff;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px dashed #bfdbfe;
+        color: #1e40af;
+    }
 </style>
+
 <body>
     <h1>{{ title }}</h1>
-    <p><strong>Run ID:</strong> {{ run_id }} | <strong>Hash:</strong> {{ snapshot_hash }} | <strong>MITRE Coverage:</strong> {{ overall_coverage }}</p>
+    <p><strong>Run ID:</strong> {{ run_id }} | <strong>Hash:</strong> {{ snapshot_hash }} | <strong>MITRE
+            Coverage:</strong> {{ overall_coverage }}</p>
     <div style="display: grid; gap: 1.5rem;">
-    {% for card in cards %}
+        {% for card in cards %}
         <div class="card">
             <h3>{{ card.title }}</h3>
-            <p>Value: <strong>{{ card.value }}</strong> | Status: <span class="status-badge status-{{ card.rag_status }}">{{ card.rag_status }}</span></p>
+            <p>Value: <strong>{{ card.value }}</strong> | Status: <span
+                    class="status-badge status-{{ card.rag_status }}">{{ card.rag_status }}</span></p>
             {% if card.financial_exposure_usd > 0 %}
             <div class="risk-box">
                 📊 <strong>FAIR Quantitative Risk Analysis (Monte Carlo 1,000 Iterations):</strong><br>
@@ -39,7 +99,8 @@
             </div>
             {% endif %}
         </div>
-    {% endfor %}
+        {% endfor %}
     </div>
 </body>
+
 </html>

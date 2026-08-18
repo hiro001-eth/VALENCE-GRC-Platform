@@ -3,14 +3,16 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Request, Response
 from starlette.responses import JSONResponse
 
+from grc_dashboard.auth.jwt_handler import decode_token
 from grc_dashboard.cache import session_store
 
 API_RATE_LIMIT = int(os.getenv("VALENCE_API_RATE_LIMIT", "120"))
+AUTHENTICATED_API_RATE_LIMIT = int(os.getenv("VALENCE_AUTHENTICATED_API_RATE_LIMIT", "600"))
 API_RATE_WINDOW_SEC = int(os.getenv("VALENCE_API_RATE_WINDOW_SEC", "60"))
 _PREFIX = "valence:edge:api:"
 
@@ -51,6 +53,21 @@ _SKIP_PREFIXES = (
 )
 
 
+def _rate_limit_subject(request: Request) -> tuple[str, int]:
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        try:
+            payload = decode_token(auth_header[7:], check_revoked=False)
+        except ValueError:
+            pass
+        else:
+            if payload.get("type") == "access":
+                subject = payload.get("sub") or payload.get("tenant_id")
+                if subject:
+                    return (f"user:{subject}", AUTHENTICATED_API_RATE_LIMIT)
+    return (f"ip:{_client_ip(request)}", API_RATE_LIMIT)
+
+
 async def edge_rate_limit_middleware(request: Request, call_next: Callable) -> Response:
     if os.getenv("VALENCE_EDGE_RATE_LIMIT", "true").lower() in {"0", "false", "no"}:
         return await call_next(request)
@@ -59,15 +76,15 @@ async def edge_rate_limit_middleware(request: Request, call_next: Callable) -> R
     if not path.startswith("/api") or any(path.startswith(p) for p in _SKIP_PREFIXES):
         return await call_next(request)
 
-    ip = _client_ip(request)
-    count = _incr(f"{_PREFIX}{ip}")
-    if count > API_RATE_LIMIT:
+    subject, limit = _rate_limit_subject(request)
+    count = _incr(f"{_PREFIX}{subject}")
+    if count > limit:
         return JSONResponse(
             status_code=429,
             content={"detail": "Rate limit exceeded. Retry later."},
             headers={"Retry-After": str(API_RATE_WINDOW_SEC)},
         )
     response = await call_next(request)
-    response.headers["X-RateLimit-Limit"] = str(API_RATE_LIMIT)
-    response.headers["X-RateLimit-Remaining"] = str(max(0, API_RATE_LIMIT - count))
+    response.headers["X-RateLimit-Limit"] = str(limit)
+    response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
     return response

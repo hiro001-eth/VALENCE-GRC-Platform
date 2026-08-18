@@ -66,3 +66,14 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Returns a cached singleton instance of the configuration settings."""
     return Settings()
+
+
+def resolve_database_url() -> str:
+    import os
+    residency = os.getenv("VALENCE_DATA_RESIDENCY", "US").strip().upper()
+    if residency == "EU":
+        return os.getenv(
+            "DATABASE_URL_EU",
+            os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./valence.db")
+        ).strip()
+    return os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./valence.db").strip()

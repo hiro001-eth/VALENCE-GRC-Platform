@@ -1,15 +1,18 @@
-import pytest
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+
+import pytest
+
 from grc_dashboard.config import get_settings
-from grc_dashboard.models.siem import SIEMEvent, SIEMQueryResult
-from grc_dashboard.models.metric import MetricDefinition, MetricValue
-from grc_dashboard.exceptions import StaleMetricException, FPRFormulaException
-from grc_dashboard.metrics.fpr_calculator import FPRCalculator
+from grc_dashboard.exceptions import FPRFormulaException, StaleMetricException
 from grc_dashboard.metrics.fair_engine import FAIREngine
 from grc_dashboard.metrics.forecaster import PredictiveForecaster
-from grc_dashboard.state.threshold_version_manager import ThresholdVersionManager
+from grc_dashboard.metrics.fpr_calculator import FPRCalculator
+from grc_dashboard.models.metric import MetricDefinition, MetricValue
+from grc_dashboard.models.siem import SIEMEvent, SIEMQueryResult
 from grc_dashboard.siem.siem_client import SIEMClient
+from grc_dashboard.state.threshold_version_manager import ThresholdVersionManager
+
 
 # Helper to construct dummy events with required fields
 def make_event(event_id: str, classification: str = None) -> SIEMEvent:
@@ -18,7 +21,7 @@ def make_event(event_id: str, classification: str = None) -> SIEMEvent:
         raw_fields["classification_label"] = classification
     return SIEMEvent(
         event_id=event_id,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         event_type="alert",
         severity="high",
         raw_fields=raw_fields
@@ -30,7 +33,7 @@ def make_metric_value(metric_id: str, value: float, computed_at: datetime) -> Me
         metric_id=metric_id,
         value=value,
         computed_at=computed_at,
-        data_freshness_utc=datetime.now(timezone.utc),
+        data_freshness_utc=datetime.now(UTC),
         is_stale=False,
         siem_query_hash="mock_query_hash",
         computation_formula_hash="mock_formula_hash",
@@ -87,8 +90,8 @@ def test_siem_client_freshness_check():
         query_hash="h1",
         events=[],
         total_count=0,
-        query_timestamp=datetime.now(timezone.utc),
-        response_freshness_utc=datetime.now(timezone.utc) - timedelta(minutes=5)
+        query_timestamp=datetime.now(UTC),
+        response_freshness_utc=datetime.now(UTC) - timedelta(minutes=5)
     )
     # Should not raise exception
     client._validate_freshness(fresh_result)
@@ -99,8 +102,8 @@ def test_siem_client_freshness_check():
         query_hash="h2",
         events=[],
         total_count=0,
-        query_timestamp=datetime.now(timezone.utc),
-        response_freshness_utc=datetime.now(timezone.utc) - timedelta(minutes=45)
+        query_timestamp=datetime.now(UTC),
+        response_freshness_utc=datetime.now(UTC) - timedelta(minutes=45)
     )
     with pytest.raises(StaleMetricException) as exc:
         client._validate_freshness(stale_result)
@@ -256,7 +259,7 @@ def _make_pdf_with_metadata(tmp_path: Path, run_id: str, snap_hash: str, thresho
     pdf_path = tmp_path / "test_report.pdf"
     metadata_line = (
         f"%% VALENCE_METADATA: run_id={run_id} snapshot_hash={snap_hash} threshold_hash={threshold_hash}\n"
-    ).encode("utf-8")
+    ).encode()
     content = (
         b"%PDF-1.4\n%% Fake PDF content for testing purposes\n"
         b"stream\nHello World\nendstream\n"

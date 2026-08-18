@@ -4,6 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
+| 3.0.x   | Yes       |
 | 2.0.x   | Yes       |
 | < 2.0   | No        |
 
@@ -11,7 +12,7 @@
 
 **Do not** open public GitHub issues for security vulnerabilities.
 
-Email: **katuwalmanjil609@gmail.com** (replace with your security alias before external launch)
+Email: **security@valence-grc.io**
 
 Include:
 - Affected component (API, frontend, auth, tenancy)
@@ -33,6 +34,8 @@ We aim to acknowledge reports within **2 business days** and provide a remediati
 | Headers | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` |
 | Audit lineage | SHA-256 evidence chain for metric snapshots |
 | Secrets | Env-based; rotate `JWT_SECRET_KEY`, OIDC secrets, sandbox passwords |
+| Edge rate limiting | Configurable per-route rate limiting with sliding window |
+| Observability | OpenTelemetry-compatible request tracing |
 
 ## Production deployment requirements
 

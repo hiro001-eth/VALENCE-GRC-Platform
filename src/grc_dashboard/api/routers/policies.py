@@ -86,6 +86,16 @@ class PolicyCreate(BaseModel):
     status: str = "published"
 
 
+class PolicyUpdate(BaseModel):
+    title: str | None = None
+    category: str | None = None
+    version: str | None = None
+    content: str | None = None
+    status: str | None = None
+    framework_tags: list[str] | None = None
+    requires_attestation: bool | None = None
+
+
 class AttestBody(BaseModel):
     policy_id: str
 
@@ -164,7 +174,7 @@ async def create_policy(
     body: PolicyCreate,
     request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: User = RequireAdmin,
+    current_user: User = RequireAnalyst,
 ) -> dict[str, Any]:
     tenant_id = get_tenant_id(request)
     policy_id = f"POL-{uuid.uuid4().hex[:8].upper()}"
@@ -183,6 +193,66 @@ async def create_policy(
     db.add(row)
     await db.commit()
     return _policy_row(row)
+
+
+@router.put("/{policy_id}")
+async def update_policy(
+    policy_id: str,
+    body: PolicyUpdate,
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: User = RequireAnalyst,
+) -> dict[str, Any]:
+    tenant_id = get_tenant_id(request)
+    result = await db.execute(
+        select(PolicyRecord).where(
+            PolicyRecord.id == policy_id,
+            PolicyRecord.tenant_id == tenant_id,
+        )
+    )
+    row = result.scalar_one_or_none()
+    if not row:
+        raise HTTPException(status_code=404, detail="Policy not found")
+
+    if body.title is not None:
+        row.title = body.title.strip()
+    if body.category is not None:
+        row.category = body.category
+    if body.version is not None:
+        row.version = body.version
+    if body.content is not None:
+        row.content = body.content
+    if body.status is not None:
+        row.status = body.status
+    if body.framework_tags is not None:
+        row.framework_tags = body.framework_tags
+    if body.requires_attestation is not None:
+        row.requires_attestation = body.requires_attestation
+
+    row.updated_at = datetime.now(UTC)
+    await db.commit()
+    return _policy_row(row)
+
+
+@router.delete("/{policy_id}", status_code=204)
+async def delete_policy(
+    policy_id: str,
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: User = RequireAnalyst,
+) -> None:
+    tenant_id = get_tenant_id(request)
+    result = await db.execute(
+        select(PolicyRecord).where(
+            PolicyRecord.id == policy_id,
+            PolicyRecord.tenant_id == tenant_id,
+        )
+    )
+    row = result.scalar_one_or_none()
+    if not row:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    await db.delete(row)
+    await db.commit()
 
 
 @router.post("/seed-templates")

@@ -1,6 +1,8 @@
 import math
 import random
+
 import structlog
+
 from grc_dashboard.models.metric import MetricDefinition
 
 logger = structlog.get_logger(__name__)

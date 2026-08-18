@@ -1,4 +1,4 @@
-name: VALENCE GRC CI
+name: CI
 
 on:
   push:

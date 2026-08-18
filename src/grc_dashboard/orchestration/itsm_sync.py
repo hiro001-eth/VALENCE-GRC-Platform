@@ -8,7 +8,6 @@ from typing import Any
 
 import httpx
 import structlog
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.db.models import CmdbAsset, IntegrationSettings, ItsTicketRecord, RemediationTask

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin, RequireAnalyst
-from grc_dashboard.db.models import BusinessUnit, ChangeRequest, WorkflowDefinition, User
+from grc_dashboard.db.models import BusinessUnit, ChangeRequest, User, WorkflowDefinition
 from grc_dashboard.db.session import get_db
 from grc_dashboard.tenancy.constants import is_demo_tenant
 

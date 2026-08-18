@@ -1,8 +1,8 @@
 """Risk router: Monte Carlo simulations, VaR heatmap."""
-from typing import Annotated, Any
+from typing import Any
 
 import structlog
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 
 from grc_dashboard.api.tenant_context import get_tenant_id, get_tenant_results
 from grc_dashboard.auth.dependencies import RequireAnalyst

@@ -1,7 +1,7 @@
 """Regenerate a valid PDF for an existing report record."""
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC
 from pathlib import Path
 
 import structlog

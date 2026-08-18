@@ -137,15 +137,10 @@ CurrentUser = Depends(get_current_user)
 
 
 def require_feature(feature: str):
-    """Enforce per-user feature flag (demo sandbox accounts bypass)."""
+    """Enforce per-user feature flag."""
     async def checker(
         current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
-        from grc_dashboard.tenancy.constants import is_demo_username
-
-        if is_demo_username(current_user.username):
-            return current_user
-
         if not has_feature(
             current_user.role,
             current_user.department,

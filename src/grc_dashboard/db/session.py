@@ -13,12 +13,13 @@ from grc_dashboard.auth.demo_credentials import (
 )
 from grc_dashboard.auth.jwt_handler import hash_password
 from grc_dashboard.db.migrations import sync_model_schema
-
 from grc_dashboard.db.models import Base
 
 logger = structlog.get_logger(__name__)
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./valence.db")
+from grc_dashboard.config import resolve_database_url
+
+DATABASE_URL = resolve_database_url()
 
 engine = create_async_engine(
     DATABASE_URL,

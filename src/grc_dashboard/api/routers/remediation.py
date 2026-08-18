@@ -10,13 +10,12 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.api.tenant_context import get_tenant_id
+from grc_dashboard.api.tenant_context import get_tenant_id, get_tenant_results
 from grc_dashboard.auth.dependencies import RequireAdmin, RequireAnalyst
 from grc_dashboard.compliance.framework_loader import FrameworkLoader
 from grc_dashboard.compliance.gap_analyzer import ComplianceGapAnalyzer
 from grc_dashboard.db.models import IntegrationSettings, RemediationTask, User
 from grc_dashboard.db.session import get_db
-from grc_dashboard.api.tenant_context import get_tenant_results
 from grc_dashboard.orchestration.itsm_sync import sync_remediation_to_itsm
 
 router = APIRouter()
@@ -46,10 +45,14 @@ class RemediationUpdate(BaseModel):
 
 
 def _row(t: RemediationTask) -> dict[str, Any]:
+    # SQLite returns naive datetimes; normalise before comparing with UTC-aware now()
+    _due = t.due_date
+    if _due is not None and _due.tzinfo is None:
+        _due = _due.replace(tzinfo=UTC)
     overdue = (
         t.status not in ("completed", "cancelled")
-        and t.due_date
-        and t.due_date < datetime.now(UTC)
+        and _due is not None
+        and _due < datetime.now(UTC)
     )
     return {
         "id": t.id,
@@ -79,6 +82,9 @@ async def list_remediation_tasks(
     status: str | None = None,
 ) -> dict[str, Any]:
     tenant_id = get_tenant_id(request)
+    # Lazy-seed demo remediation tasks on first access
+    from grc_dashboard.db.persistence import ensure_demo_remediation
+    await ensure_demo_remediation(db, tenant_id)
     query = select(RemediationTask).where(RemediationTask.tenant_id == tenant_id)
     if status:
         query = query.where(RemediationTask.status == status)
@@ -190,7 +196,7 @@ async def create_tasks_from_gaps(
     for fw in FrameworkLoader().list_frameworks()[:3]:
         analysis = _analyzer.analyze_gap(fw, metrics)
         for control in analysis.get("controls", []):
-            if control.get("status") in ("compliant",):
+            if control.get("status") in ("Compliant",):
                 continue
             if len(created) >= limit:
                 break
@@ -201,7 +207,7 @@ async def create_tasks_from_gaps(
                 title=title,
                 description=control.get("gap_reason") or "Compliance gap detected by continuous monitoring.",
                 owner=current_user.username,
-                priority="high" if control.get("status") == "non_compliant" else "medium",
+                priority="critical" if control.get("status") == "Non-Compliant" else "high" if control.get("status") == "At Risk" else "medium",
                 status="open",
                 due_date=datetime.now(UTC) + timedelta(hours=72),
                 framework=fw,

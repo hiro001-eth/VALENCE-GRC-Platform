@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pytest
+
 from grc_dashboard.billing.entitlements import plan_limits, subscription_allows_access
 from grc_dashboard.db.models import Tenant
 from grc_dashboard.integrations.oauth import start_oauth_flow

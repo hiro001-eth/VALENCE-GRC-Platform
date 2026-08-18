@@ -12,9 +12,9 @@ from grc_dashboard.collectors.github_collector import collect_github_evidence
 from grc_dashboard.collectors.google_workspace_collector import collect_google_workspace_evidence
 from grc_dashboard.collectors.jamf_collector import collect_jamf_evidence
 from grc_dashboard.collectors.jira_collector import collect_jira_evidence
-from grc_dashboard.collectors.servicenow_collector import collect_servicenow_evidence
 from grc_dashboard.collectors.kandji_collector import collect_kandji_evidence
 from grc_dashboard.collectors.okta_collector import collect_okta_evidence
+from grc_dashboard.collectors.servicenow_collector import collect_servicenow_evidence
 from grc_dashboard.db.persistence import append_evidence_record
 from grc_dashboard.db.session import AsyncSessionLocal
 from grc_dashboard.integrations.secrets import merge_collector_config

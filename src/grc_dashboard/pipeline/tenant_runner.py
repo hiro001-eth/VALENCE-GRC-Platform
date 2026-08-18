@@ -6,10 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import structlog
-import yaml
 from sqlalchemy import select
 
-from grc_dashboard.config import Settings, get_settings
+from grc_dashboard.config import get_settings
 from grc_dashboard.db.models import IntegrationSettings, MetricHistoryRecord, Tenant
 from grc_dashboard.db.session import AsyncSessionLocal
 from grc_dashboard.pipeline.metrics_formatter import format_dashboard_payload

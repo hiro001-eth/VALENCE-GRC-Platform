@@ -1,4 +1,4 @@
-const CACHE_NAME = 'valence-grc-v3.11';
+const CACHE_NAME = 'valence-grc-v3.12';
 const ASSETS = [
   '/',
   '/static/index.html',

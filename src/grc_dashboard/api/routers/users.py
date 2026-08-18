@@ -4,19 +4,18 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.auth.dependencies import CurrentUser, RequireAdmin, require_feature
+from grc_dashboard.auth.dependencies import CurrentUser, require_feature
 from grc_dashboard.auth.features import (
     ALL_FEATURES,
     DEPARTMENT_LABELS,
     DEPARTMENT_PRESETS,
     DEPARTMENTS,
     FEATURE_LABELS,
-    allowed_feature_list,
     resolve_features,
 )
 from grc_dashboard.auth.jwt_handler import hash_password
@@ -29,6 +28,24 @@ logger = structlog.get_logger(__name__)
 router = APIRouter()
 
 
+import re as _re
+
+# OWASP password complexity: min 8 chars, upper, lower, digit, special
+_PASSWORD_COMPLEXITY_RE = _re.compile(
+    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}|;:\'",.<>?/`~\\]).{8,128}$'
+)
+
+
+def _validate_password_strength(password: str) -> str:
+    """Enforce OWASP password complexity requirements."""
+    if not _PASSWORD_COMPLEXITY_RE.match(password):
+        raise ValueError(
+            "Password must be 8-128 characters with at least one uppercase letter, "
+            "one lowercase letter, one digit, and one special character."
+        )
+    return password
+
+
 class InviteUserRequest(BaseModel):
     username: str = Field(min_length=3, max_length=100)
     email: str = Field(min_length=5, max_length=255)
@@ -37,6 +54,12 @@ class InviteUserRequest(BaseModel):
     role: str = Field(default="analyst", pattern="^(admin|ciso|analyst|auditor)$")
     department: str = Field(default="general")
     features: list[str] | None = None
+
+    @classmethod
+    def model_validate(cls, *args, **kwargs):
+        obj = super().model_validate(*args, **kwargs)
+        _validate_password_strength(obj.password)
+        return obj
 
 
 class UpdateUserRequest(BaseModel):
@@ -97,6 +120,11 @@ async def list_team_members(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: User = Depends(require_feature("team_admin")),
 ) -> list[dict[str, Any]]:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Only administrators can access the team user directory."
+        )
     result = await db.execute(
         select(User)
         .where(User.tenant_id == current_user.tenant_id)
@@ -195,12 +223,12 @@ async def update_team_member(
     return _user_row(user)
 
 
-@router.delete("/{user_id}", status_code=204)
+@router.delete("/{user_id}", status_code=204, response_class=Response)
 async def deactivate_team_member(
     user_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: User = Depends(require_feature("team_admin")),
-) -> None:
+) -> Response:
     if user_id == current_user.id:
         raise HTTPException(status_code=400, detail="You cannot deactivate your own account")
     result = await db.execute(
@@ -211,3 +239,4 @@ async def deactivate_team_member(
         raise HTTPException(status_code=404, detail="User not found")
     user.is_active = False
     await db.commit()
+    return Response(status_code=204)

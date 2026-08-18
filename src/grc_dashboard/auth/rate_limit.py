@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any
 
 import structlog
 
@@ -21,11 +20,23 @@ _PREFIX_FAIL = "valence:rl:fail:"
 _PREFIX_LOCK = "valence:rl:lock:"
 
 
+_MAX_COUNTER_ENTRIES = 50_000  # Prevent unbounded growth under sustained attack
+
 _memory_counters: dict[str, tuple[int, float]] = {}
 
 
 def _incr_memory(key: str, ttl_seconds: int) -> int:
     now = time.time()
+    # Purge expired entries periodically
+    if len(_memory_counters) > _MAX_COUNTER_ENTRIES:
+        expired = [k for k, (_, exp) in _memory_counters.items() if exp <= now]
+        for k in expired:
+            _memory_counters.pop(k, None)
+        # If still over, evict oldest
+        if len(_memory_counters) > _MAX_COUNTER_ENTRIES:
+            sorted_keys = sorted(_memory_counters, key=lambda k: _memory_counters[k][1])
+            for k in sorted_keys[:len(_memory_counters) - _MAX_COUNTER_ENTRIES]:
+                _memory_counters.pop(k, None)
     entry = _memory_counters.get(key)
     if not entry or entry[1] <= now:
         _memory_counters[key] = (1, now + ttl_seconds)

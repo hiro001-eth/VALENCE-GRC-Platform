@@ -1,8 +1,8 @@
 
 import os
-import structlog
 
 import httpx
+import structlog
 
 from grc_dashboard.config import Settings
 from grc_dashboard.models.metric import MetricDefinition

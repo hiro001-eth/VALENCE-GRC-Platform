@@ -56,7 +56,7 @@ class STIXLoader:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(self.settings.mitre.stix_url)) as response:
                     response.raise_for_status()
-                    res = await response.json()
+                    res = await response.json(content_type=None)
                     if isinstance(res, dict):
                         return res
                     raise ValueError("Expected JSON object from TAXII")

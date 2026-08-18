@@ -1,4 +1,7 @@
-# Unified controls mapped across SOC2, ISO27001, HIPAA, GDPR, NIST CSF
+# Unified controls mapped across SOC2, ISO27001, HIPAA, GDPR, NIST CSF, PCI DSS,
+# DORA, FedRAMP, CMMC, and NIS2.
+# Each UCF entry maps a single security objective to the equivalent control ID in
+# every supported framework, enabling cross-framework gap closure at a glance.
 unified_controls:
   - id: UCF-AC-001
     title: Logical Access Control
@@ -8,6 +11,12 @@ unified_controls:
       HIPAA: HIPAA-164.312(a)(1)
       GDPR: GDPR-Art32
       NIST_CSF: NIST-PR.AC-01
+      PCI_DSS: PCI-7.2
+      DORA: DORA-ICT-5.1
+      FedRAMP: FEDRAMP-AC-2
+      CMMC: CMMC-3.1.1
+      NIS2: NIS2-ART-21.2i
+
   - id: UCF-IR-001
     title: Incident Detection & Response
     frameworks:
@@ -16,6 +25,12 @@ unified_controls:
       HIPAA: HIPAA-164.308(a)(6)
       GDPR: GDPR-Art33
       NIST_CSF: NIST-RS.MA-01
+      PCI_DSS: PCI-12.10
+      DORA: DORA-ICT-2.1
+      FedRAMP: FEDRAMP-IR-4
+      CMMC: CMMC-3.6.1
+      NIS2: NIS2-ART-21.2b
+
   - id: UCF-VM-001
     title: Vulnerability Management
     frameworks:
@@ -23,6 +38,11 @@ unified_controls:
       ISO27001: ISO-A.8.8
       HIPAA: HIPAA-164.308(a)(5)
       NIST_CSF: NIST-DE.CM-01
+      PCI_DSS: PCI-11.3
+      FedRAMP: FEDRAMP-RA-5
+      CMMC: CMMC-3.11.2
+      NIS2: NIS2-ART-21.2e
+
   - id: UCF-DP-001
     title: Data Protection & Encryption
     frameworks:
@@ -31,12 +51,20 @@ unified_controls:
       HIPAA: HIPAA-164.312(e)(1)
       GDPR: GDPR-Art32
       PCI_DSS: PCI-3.4
+      DORA: DORA-ICT-5.2
+      FedRAMP: FEDRAMP-SC-7
+      CMMC: CMMC-3.13.1
+      NIS2: NIS2-ART-21.2g
+
   - id: UCF-CM-001
     title: Change Management
     frameworks:
       SOC2: SOC2-CC8.1
       ISO27001: ISO-A.8.2
       NIST_CSF: NIST-GV.OC-01
+      PCI_DSS: PCI-2.2
+      FedRAMP: FEDRAMP-SI-2
+
   - id: UCF-AU-001
     title: Audit Logging & Monitoring
     frameworks:
@@ -44,3 +72,69 @@ unified_controls:
       ISO27001: ISO-A.8.15
       HIPAA: HIPAA-164.312(b)
       NIST_CSF: NIST-DE.AE-01
+      PCI_DSS: PCI-10.2
+      FedRAMP: FEDRAMP-AU-6
+      CMMC: CMMC-3.3.1
+      NIS2: NIS2-ART-21.2f
+
+  - id: UCF-BC-001
+    title: Business Continuity & Recovery
+    frameworks:
+      SOC2: SOC2-CC9.1
+      ISO27001: ISO-A.5.30
+      HIPAA: HIPAA-164.308(a)(7)
+      GDPR: GDPR-Art32
+      NIST_CSF: NIST-RC.RP-01
+      DORA: DORA-ICT-2.6
+      NIS2: NIS2-ART-21.2c
+
+  - id: UCF-SA-001
+    title: Security Awareness & Training
+    frameworks:
+      SOC2: SOC2-CC1.4
+      ISO27001: ISO-A.6.3
+      HIPAA: HIPAA-164.308(a)(5)
+      NIST_CSF: NIST-GV.OC-01
+      PCI_DSS: PCI-12.10
+      NIS2: NIS2-ART-21.2f
+
+  - id: UCF-SC-001
+    title: Supply Chain & Vendor Risk
+    frameworks:
+      SOC2: SOC2-CC9.2
+      ISO27001: ISO-A.5.19
+      GDPR: GDPR-Art35
+      NIST_CSF: NIST-ID.AM-01
+      DORA: DORA-ICT-2.2
+      NIS2: NIS2-ART-21.2d
+
+  - id: UCF-PR-001
+    title: Privacy & Data Subject Rights
+    frameworks:
+      SOC2: SOC2-P1.1
+      ISO27001: ISO-A.5.34
+      HIPAA: HIPAA-164.312(c)(1)
+      GDPR: GDPR-Art25
+      NIST_CSF: NIST-PR.DS-01
+
+  - id: UCF-UA-001
+    title: User Authentication & MFA
+    frameworks:
+      SOC2: SOC2-CC6.3
+      ISO27001: ISO-A.8.5
+      HIPAA: HIPAA-164.312(d)
+      PCI_DSS: PCI-8.3
+      FedRAMP: FEDRAMP-AC-17
+      CMMC: CMMC-3.5.2
+      NIS2: NIS2-ART-21.2i
+
+  - id: UCF-TI-001
+    title: Threat Intelligence & Anomaly Detection
+    frameworks:
+      SOC2: SOC2-CC3.1
+      ISO27001: ISO-A.5.7
+      NIST_CSF: NIST-DE.AE-01
+      DORA: DORA-ICT-2.5
+      FedRAMP: FEDRAMP-CA-7
+      CMMC: CMMC-3.14.1
+      NIS2: NIS2-ART-21.2a

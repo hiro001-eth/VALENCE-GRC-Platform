@@ -1,4 +1,5 @@
 from typing import Any
+
 import structlog
 
 from grc_dashboard.config import Settings

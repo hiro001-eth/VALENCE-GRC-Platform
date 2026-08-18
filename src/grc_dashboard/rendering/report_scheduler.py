@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from grc_dashboard.alerting.email_delivery import EmailDelivery
 from grc_dashboard.db.models import ReportRecord, ReportSchedule
-from grc_dashboard.db.persistence import get_report, save_report, update_report_status
+from grc_dashboard.db.persistence import get_report, save_report
 from grc_dashboard.db.session import AsyncSessionLocal
 
 logger = structlog.get_logger(__name__)

@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, Float, JSON, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -601,4 +601,89 @@ class AuditorEngagement(Base):
     scope_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     requested_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class AuditActivityLog(Base):
+    """Who did what, when — enterprise audit trail for SOC2/ISO27001 compliance."""
+    __tablename__ = "audit_activity_log"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(50), index=True)
+    username: Mapped[str] = mapped_column(String(100), index=True)
+    action: Mapped[str] = mapped_column(String(100))
+    resource_type: Mapped[str] = mapped_column(String(100), default="")
+    resource_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    details: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    ip_address: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class MaturityAssessment(Base):
+    """CMMI-style security maturity assessments — differentiator vs Drata/Vanta."""
+    __tablename__ = "maturity_assessments"
+
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(50), index=True)
+    framework: Mapped[str] = mapped_column(String(50), default="NIST_CSF")
+    domain: Mapped[str] = mapped_column(String(100))
+    current_level: Mapped[int] = mapped_column(default=1)  # 1-5 CMMI scale
+    target_level: Mapped[int] = mapped_column(default=3)
+    assessor: Mapped[str] = mapped_column(String(100), default="")
+    findings: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    recommendations: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    evidence_ids: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    assessed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class BreachSimulation(Base):
+    """Breach cost simulation records — FAIR-based what-if scenarios."""
+    __tablename__ = "breach_simulations"
+
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(50), index=True)
+    scenario_name: Mapped[str] = mapped_column(String(200))
+    threat_actor: Mapped[str] = mapped_column(String(100), default="external")
+    attack_vector: Mapped[str] = mapped_column(String(100), default="phishing")
+    affected_assets: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    records_exposed: Mapped[int] = mapped_column(default=0)
+    estimated_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    simulation_params: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    results: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_by: Mapped[str] = mapped_column(String(100), default="system")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class RiskTreatmentPlan(Base):
+    """Risk treatment workflows — accept/mitigate/transfer/avoid decisions (beats Vanta's basic risk register)."""
+    __tablename__ = "risk_treatment_plans"
+
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(50), index=True)
+    risk_id: Mapped[str] = mapped_column(String(50), index=True)
+    treatment_type: Mapped[str] = mapped_column(String(30), default="mitigate")  # accept | mitigate | transfer | avoid
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    owner: Mapped[str] = mapped_column(String(100), default="")
+    status: Mapped[str] = mapped_column(String(30), default="draft")  # draft | approved | in_progress | completed
+    residual_risk_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    investment_usd: Mapped[float | None] = mapped_column(Float, nullable=True)
+    expected_risk_reduction_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    approved_by: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )

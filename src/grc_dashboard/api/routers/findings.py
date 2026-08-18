@@ -1,18 +1,17 @@
 """Audit findings router: tracks findings remediation state machine workflow."""
 import hashlib
 import uuid
-from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 import structlog
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from grc_dashboard.db.persistence import append_evidence_record
 from grc_dashboard.auth.dependencies import RequireAnalyst, RequireAuditor
 from grc_dashboard.db.models import AuditFinding, User
+from grc_dashboard.db.persistence import append_evidence_record
 from grc_dashboard.db.session import get_db
 
 logger = structlog.get_logger(__name__)
@@ -21,15 +20,15 @@ router = APIRouter()
 
 class FindingCreate(BaseModel):
     title: str
-    description: Optional[str] = None
-    metric_id: Optional[str] = None
+    description: str | None = None
+    metric_id: str | None = None
     severity: str = "high"  # critical | high | medium | low
 
 
 class FindingUpdate(BaseModel):
-    status: Optional[str] = None
-    owner_username: Optional[str] = None
-    remediation_plan: Optional[str] = None
+    status: str | None = None
+    owner_username: str | None = None
+    remediation_plan: str | None = None
 
 
 @router.get("/")
@@ -48,34 +47,53 @@ async def list_findings(
     )
     findings = result.scalars().all()
     
-    # If no findings exist for this tenant, seed 2 default findings so it is not empty
+    # If no findings exist for this tenant, seed 2 default findings (exactly once)
     if not findings:
-        findings = [
-            AuditFinding(
-                id=f"FIND-2026-{uuid.uuid4().hex[:4].upper()}",
-                tenant_id=tenant_id,
-                title="Critical CVE Patch Lag Exceeds Threshold",
-                description="8 critical CVEs remained unpatched for more than 7 days, violating SLA limits.",
-                metric_id="KRI-CVE-001",
-                severity="critical",
-                status="finding",
-                owner_username=None,
-                remediation_plan=None,
-            ),
-            AuditFinding(
-                id=f"FIND-2026-{uuid.uuid4().hex[:4].upper()}",
-                tenant_id=tenant_id,
-                title="DLP Policy Violations Spike",
-                description="Abnormal egress file transfers detected in cloud database assets.",
-                metric_id="KRI-DLP-001",
-                severity="high",
-                status="assigned",
-                owner_username="analyst",
-                remediation_plan="Review access controls, update egress threshold levels, and isolate the source database.",
-            ),
+        seed_data = [
+            {
+                "title": "Critical CVE Patch Lag Exceeds Threshold",
+                "description": "8 critical CVEs remained unpatched for more than 7 days, violating SLA limits.",
+                "metric_id": "KRI-CVE-001",
+                "severity": "critical",
+                "status": "finding",
+                "owner_username": None,
+                "remediation_plan": None,
+            },
+            {
+                "title": "DLP Policy Violations Spike",
+                "description": "Abnormal egress file transfers detected in cloud database assets.",
+                "metric_id": "KRI-DLP-001",
+                "severity": "high",
+                "status": "assigned",
+                "owner_username": "analyst",
+                "remediation_plan": "Review access controls, update egress threshold levels, and isolate the source database.",
+            },
         ]
-        db.add_all(findings)
+        for item in seed_data:
+            # Deduplicate: skip if a finding with this title already exists for this tenant
+            existing_check = await db.execute(
+                select(AuditFinding.id).where(
+                    AuditFinding.tenant_id == tenant_id,
+                    AuditFinding.title == item["title"],
+                ).limit(1)
+            )
+            if existing_check.scalar_one_or_none():
+                continue
+
+            db.add(
+                AuditFinding(
+                    id=f"FIND-2026-{uuid.uuid4().hex[:6].upper()}",
+                    tenant_id=tenant_id,
+                    **item,
+                )
+            )
         await db.commit()
+        result = await db.execute(
+            select(AuditFinding)
+            .where(AuditFinding.tenant_id == tenant_id)
+            .order_by(AuditFinding.created_at.desc())
+        )
+        findings = result.scalars().all()
         
     return [
         {

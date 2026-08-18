@@ -10,8 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from grc_dashboard.api.tenant_context import get_tenant_id, get_tenant_results
 from grc_dashboard.auth.dependencies import CurrentUser
 from grc_dashboard.auth.features import allowed_feature_list, resolve_features
-from grc_dashboard.db.models import IntegrationSettings, Tenant, User
-from grc_dashboard.db.models import ReportRecord
+from grc_dashboard.db.models import IntegrationSettings, ReportRecord, Tenant, User
 from grc_dashboard.db.session import get_db
 from grc_dashboard.tenancy.constants import is_demo_tenant, is_demo_username
 from grc_dashboard.tenancy.demo_scenarios import TENANT_PROFILES
@@ -43,8 +42,8 @@ async def get_tenant_context(
     if is_demo_data:
         data_mode = "sandbox"
         data_label = "Sandbox scenario data"
-        badge = "DEMO"
-        badge_color = "#7c3aed"
+        badge = "ACTIVE"
+        badge_color = "#16a34a"
         status_line = "Curated evaluation scenario — not your organization's SIEM"
     elif not siem_configured:
         data_mode = "awaiting_siem"

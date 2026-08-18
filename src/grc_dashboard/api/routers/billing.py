@@ -14,12 +14,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin
-from grc_dashboard.db.models import BillingWebhookEvent, Tenant, User
 from grc_dashboard.billing.entitlements import (
     entitlements_summary,
-    require_active_subscription,
     stripe_required_for_checkout,
 )
+from grc_dashboard.db.models import BillingWebhookEvent, Tenant, User
 from grc_dashboard.db.session import get_db
 
 logger = structlog.get_logger(__name__)
@@ -173,7 +172,21 @@ async def stripe_webhook(
                 )
                 event = dict(evt)
             else:
-                # Local/dev fallback.
+                # SECURITY: Stripe key is set but no webhook secret — block in production
+                from grc_dashboard.deployment.production import IS_PRODUCTION
+
+                if IS_PRODUCTION:
+                    raise HTTPException(
+                        status_code=503,
+                        detail=(
+                            "STRIPE_WEBHOOK_SECRET must be set when STRIPE_SECRET_KEY is configured. "
+                            "Unsigned webhook payloads are not accepted in production."
+                        ),
+                    )
+                logger.warning(
+                    "stripe_webhook_unverified",
+                    message="Accepting unverified webhook in development — set STRIPE_WEBHOOK_SECRET",
+                )
                 event = json.loads(payload.decode("utf-8"))
         except HTTPException:
             raise

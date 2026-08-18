@@ -9,16 +9,44 @@ controls:
   - id: "NIS2-ART-21.2b"
     title: "Incident Handling"
     description: "Implement incident prevention, detection, response, and recovery procedures."
+    metric_ids: ["KRI-MTTR-001", "KRI-MTTD-001"]
+  - id: "NIS2-ART-21.2c"
+    title: "Business Continuity & Crisis Management"
+    description: "Ensure business continuity including backup management and disaster recovery."
     metric_ids: ["KRI-MTTR-001"]
-  - id: "NIS2-ART-21.2e"
+  - id: "NIS2-ART-21.2d"
     title: "Supply Chain Security"
-    description: "Ensure security of assets in relation to suppliers and providers."
+    description: "Ensure security of assets in relation to direct suppliers and service providers including vulnerability handling."
     metric_ids: ["KRI-CVE-001"]
+  - id: "NIS2-ART-21.2e"
+    title: "Network & Information System Acquisition"
+    description: "Security in network and information system acquisition, development, and maintenance including vulnerability handling and disclosure."
+    metric_ids: ["KRI-CVE-001"]
+  - id: "NIS2-ART-21.2f"
+    title: "Cyber Hygiene & Training"
+    description: "Policies and procedures to assess the effectiveness of cybersecurity risk management measures."
+    metric_ids: ["KPI-FPR-001"]
+  - id: "NIS2-ART-21.2g"
+    title: "Cryptography & Encryption"
+    description: "Use of cryptography and encryption to ensure confidentiality and integrity."
+    metric_ids: ["KRI-DLP-001"]
+  - id: "NIS2-ART-21.2h"
+    title: "Human Resources Security"
+    description: "Human resources security, access control policies, and asset management."
+    metric_ids: ["KPI-PHI-001"]
   - id: "NIS2-ART-21.2i"
-    title: "Access Control Policies"
-    description: "Enforce multi-factor authentication and privileged account reviews."
+    title: "Access Control & Authentication"
+    description: "Enforce multi-factor authentication, continuous authentication, and secured communications."
     metric_ids: ["KPI-PHI-001"]
   - id: "NIS2-ART-21.2j"
-    title: "Cryptography"
-    description: "Use of cryptography and encryption to prevent data leaks."
+    title: "Secure Communications"
+    description: "Use of secured voice, video, and text communications and secured emergency communication systems."
     metric_ids: ["KRI-DLP-001"]
+  - id: "NIS2-ART-23.1"
+    title: "Incident Notification (Early Warning)"
+    description: "Provide early warning to CSIRT within 24 hours of becoming aware of a significant incident."
+    metric_ids: ["KRI-MTTD-001"]
+  - id: "NIS2-ART-23.2"
+    title: "Incident Notification (Full Report)"
+    description: "Submit incident notification to CSIRT within 72 hours with initial assessment."
+    metric_ids: ["KRI-MTTD-001", "KRI-MTTR-001"]

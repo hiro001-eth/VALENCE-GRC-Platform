@@ -1,8 +1,9 @@
 import contextlib
 import json
+from collections.abc import Generator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Generator, Optional
+from typing import Any
 
 try:
     import fcntl
@@ -23,7 +24,7 @@ logger = structlog.get_logger(__name__)
 
 class ThresholdState(BaseModel):
     active_threshold_hash: str
-    previous_threshold_hash: Optional[str]
+    previous_threshold_hash: str | None
     activated_at: datetime
     activated_by: str
 
@@ -45,7 +46,7 @@ class ThresholdVersionManager:
 
     def _load_unlocked(self) -> ThresholdState:
         try:
-            with open(self.state_path, "r") as f:
+            with open(self.state_path) as f:
                 data = json.load(f)
             return ThresholdState.model_validate(data)
         except Exception as e:
@@ -118,18 +119,17 @@ class ThresholdVersionManager:
     def _ensure_state_exists(self) -> None:
         if not self.state_path.exists():
             self.state_path.parent.mkdir(parents=True, exist_ok=True)
-            with self._acquire_lock():
-                with open(self.state_path, "w") as f:
-                    json.dump({
-                        "active_threshold_hash": "initial_empty_hash",
-                        "previous_threshold_hash": None,
-                        "activated_at": datetime.now(UTC).isoformat(),
-                        "activated_by": "system_init"
-                    }, f)
+            with self._acquire_lock(), open(self.state_path, "w") as f:
+                json.dump({
+                    "active_threshold_hash": "initial_empty_hash",
+                    "previous_threshold_hash": None,
+                    "activated_at": datetime.now(UTC).isoformat(),
+                    "activated_by": "system_init"
+                }, f)
 
     def _read_raw(self) -> dict[str, Any]:
         try:
-            with open(self.state_path, "r") as f:
+            with open(self.state_path) as f:
                 data = json.load(f)
                 if isinstance(data, dict):
                     return data

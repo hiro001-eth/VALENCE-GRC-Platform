@@ -1,10 +1,11 @@
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, patch
+from sqlalchemy import select
 
 from grc_dashboard.alerting.alert_engine import AlertEngine
 from grc_dashboard.db.models import AlertRecord
-from grc_dashboard.db.session import init_db, AsyncSessionLocal
-from sqlalchemy import select
+from grc_dashboard.db.session import AsyncSessionLocal, init_db
 
 
 @pytest.fixture(scope="module", autouse=True)

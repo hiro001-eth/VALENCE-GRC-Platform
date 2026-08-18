@@ -1,5 +1,4 @@
 """Tests for production configuration validation."""
-import os
 
 import pytest
 

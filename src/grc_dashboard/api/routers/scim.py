@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 import secrets
-import uuid
 from datetime import UTC, datetime
 from typing import Annotated, Any
 
@@ -60,7 +59,20 @@ async def verify_scim_auth(
 ) -> str:
     token = _scim_token()
     if not token:
-        raise HTTPException(status_code=503, detail="SCIM not configured. Set SCIM_BEARER_TOKEN.")
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "status": "not_configured",
+                "message": "SCIM provisioning is not enabled on this instance.",
+                "setup": (
+                    "To enable SCIM user provisioning for Azure AD or Okta, "
+                    "set the SCIM_BEARER_TOKEN environment variable to a secure random string. "
+                    "Then configure your IdP to POST to /api/scim/v2/Users with Bearer auth."
+                ),
+                "docs_url": "/api/docs#/SCIM%20Provisioning",
+                "environment": os.getenv("VALENCE_ENV", "development"),
+            },
+        )
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing SCIM bearer token")
     if not secrets.compare_digest(authorization[7:], token):
@@ -104,6 +116,18 @@ async def service_provider_config() -> dict[str, Any]:
     }
 
 
+import re
+
+# Strict SCIM filter pattern: userName eq "value"
+_SCIM_FILTER_PATTERN = re.compile(
+    r'^userName\s+eq\s+"([^"]{1,200})"$',
+    re.IGNORECASE,
+)
+
+# Username allowlist: alphanumeric, dots, hyphens, underscores, @
+_USERNAME_SAFE_PATTERN = re.compile(r'^[a-zA-Z0-9._@\-]{1,200}$')
+
+
 @router.get("/Users")
 async def list_users(
     request: Request,
@@ -114,9 +138,21 @@ async def list_users(
     count: int = Query(default=100, ge=1, le=200),
 ) -> dict[str, Any]:
     query = select(User).where(User.tenant_id == tenant_id)
-    if filter and "userName eq" in filter:
-        username = filter.split('"')[1] if '"' in filter else filter.split()[-1]
-        query = query.where(User.username == username)
+    if filter:
+        match = _SCIM_FILTER_PATTERN.match(filter.strip())
+        if match:
+            username = match.group(1)
+            if not _USERNAME_SAFE_PATTERN.match(username):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid characters in userName filter value",
+                )
+            query = query.where(User.username == username)
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail='Unsupported SCIM filter. Only \'userName eq "value"\' is supported.',
+            )
     result = await db.execute(query)
     users = result.scalars().all()
     resources = [_scim_user(u) for u in users[startIndex - 1 : startIndex - 1 + count]]

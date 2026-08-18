@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import structlog
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,14 +49,15 @@ async def list_reports_endpoint(
 @router.post("/generate", status_code=status.HTTP_202_ACCEPTED)
 async def generate_report(
     body: GenerateReportRequest,
-    background_tasks: BackgroundTasks,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: User = RequireAnalyst,
 ) -> dict[str, str]:
     tenant_id = get_tenant_id(request)
     results = get_tenant_results(request)
-    run_id = results.get("run_id") or f"VALENCE_{uuid.uuid4().hex[:8].upper()}"
+    base_run_id = results.get("run_id") or "VALENCE"
+    run_id = f"{base_run_id}_{uuid.uuid4().hex[:8].upper()}"
 
     record = ReportRecord(
         tenant_id=tenant_id,
@@ -71,7 +72,10 @@ async def generate_report(
     )
     await save_report(db, record)
     report_id = f"RPT_{run_id}"
+    
+    # Process PDF generation via background task immediately
     background_tasks.add_task(_generate_pdf_task, tenant_id, run_id)
+    
     return {"report_id": report_id, "status": "generating", "message": "Report generation started"}
 
 
@@ -117,19 +121,20 @@ async def create_report_schedule(
     }
 
 
-@router.delete("/schedules/{schedule_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/schedules/{schedule_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def delete_report_schedule(
     schedule_id: int,
     request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: User = RequireAnalyst,
-) -> None:
+) -> Response:
     tenant_id = get_tenant_id(request)
     row = await db.get(ReportSchedule, schedule_id)
     if not row or row.tenant_id != tenant_id:
         raise HTTPException(status_code=404, detail="Schedule not found")
     await db.delete(row)
     await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/{report_id}/status")

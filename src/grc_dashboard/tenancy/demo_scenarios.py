@@ -194,33 +194,150 @@ def _overall_rag(metrics: list[dict[str, Any]]) -> str:
 
 
 def demo_evidence_seed(tenant_id: str) -> list[dict[str, Any]]:
-    """Realistic evidence chain entries per demo tenant."""
+    """Realistic evidence chain entries per demo tenant.
+
+    Each record includes ``control_id`` so that
+    ``group_evidence_by_control()`` can link evidence to framework controls.
+    """
+    _common_metric_evidence: list[tuple[str, str, dict[str, Any], str]] = [
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-MTTD-001", "control_id": "SOC2-CC7.3", "value": 14.2, "rag_status": "Amber"}, "VALENCE_AUTO_01"),
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-MTTR-001", "control_id": "DORA-ICT-2.6", "value": 48.7, "rag_status": "Red"}, "VALENCE_AUTO_02"),
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KPI-FPR-001", "control_id": "SOC2-CC7.1", "value": 18.4, "rag_status": "Green"}, "VALENCE_AUTO_03"),
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-CVE-001", "control_id": "SOC2-CC7.2", "value": 8.0, "rag_status": "Red"}, "VALENCE_AUTO_04"),
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KPI-PHI-001", "control_id": "SOC2-CC6.1", "value": 94.1, "rag_status": "Green"}, "VALENCE_AUTO_05"),
+        ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-DLP-001", "control_id": "SOC2-CC6.6", "value": 37, "rag_status": "Amber"}, "VALENCE_AUTO_06"),
+    ]
+
     base_events: dict[str, list[tuple[str, str, dict[str, Any], str]]] = {
-        "demo-global-hq": [
-            ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-MTTR-001", "value": 48.7, "rag_status": "Red"}, "VALENCE_MFG001"),
-            ("compliance_check", "audit_evidence", {"framework": "DORA", "control": "ICT-2.6", "status": "Non-Compliant"}, "VALENCE_MFG002"),
-            ("alert_triggered", "incident_response", {"alert_type": "SLA_BREACH", "metric_id": "KRI-MTTR-001"}, "VALENCE_MFG003"),
+        "demo-global-hq": _common_metric_evidence + [
+            ("compliance_check", "audit_evidence", {"framework": "DORA", "control_id": "DORA-ICT-2.6", "title": "Response and Recovery", "status": "Non-Compliant"}, "VALENCE_MFG002"),
+            ("compliance_check", "audit_evidence", {"framework": "DORA", "control_id": "DORA-ICT-2.1", "title": "ICT Risk Management Framework", "status": "At Risk"}, "VALENCE_MFG003"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC7.3", "title": "Incident Response", "status": "Non-Compliant"}, "VALENCE_MFG004"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC6.1", "title": "Logical Access Controls", "status": "Compliant"}, "VALENCE_MFG005"),
+            ("compliance_check", "audit_evidence", {"framework": "ISO27001", "control_id": "ISO-A.8.8", "title": "Management of technical vulnerabilities", "status": "Non-Compliant"}, "VALENCE_MFG006"),
+            ("compliance_check", "audit_evidence", {"framework": "ISO27001", "control_id": "ISO-A.5.24", "title": "Incident management planning", "status": "At Risk"}, "VALENCE_MFG007"),
+            ("alert_triggered", "incident_response", {"alert_type": "SLA_BREACH", "metric_id": "KRI-MTTR-001", "control_id": "DORA-ICT-2.6"}, "VALENCE_MFG008"),
+            ("access_review", "governance", {"control_id": "SOC2-CC6.3", "scope": "quarterly_PAM", "stale_accounts": 3, "status": "Compliant"}, "VALENCE_MFG009"),
+            ("pipeline_execution", "system_health", {"run_id": "VALENCE_DEMO", "metrics_processed": 6, "status": "success"}, "VALENCE_MFG010"),
         ],
-        "demo-us-retail": [
-            ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-CVE-001", "value": 14.5, "rag_status": "Red"}, "VALENCE_RET001"),
-            ("compliance_check", "audit_evidence", {"framework": "PCI-DSS", "control": "6.2", "status": "Non-Compliant"}, "VALENCE_RET002"),
-            ("alert_triggered", "incident_response", {"alert_type": "DLP_EGRESS", "records_affected": 1240}, "VALENCE_RET003"),
+        "demo-us-retail": _common_metric_evidence + [
+            ("compliance_check", "audit_evidence", {"framework": "PCI_DSS", "control_id": "PCI-6.2", "title": "Patch Management", "status": "Non-Compliant"}, "VALENCE_RET002"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC7.2", "title": "Vulnerability Management", "status": "Non-Compliant"}, "VALENCE_RET003"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC6.6", "title": "Logical Access Security", "status": "At Risk"}, "VALENCE_RET004"),
+            ("alert_triggered", "incident_response", {"alert_type": "DLP_EGRESS", "records_affected": 1240, "control_id": "SOC2-CC6.6"}, "VALENCE_RET005"),
+            ("access_review", "governance", {"control_id": "SOC2-CC6.1", "scope": "store_manager_credentials", "shared_creds_pct": 19, "status": "Non-Compliant"}, "VALENCE_RET006"),
+            ("pipeline_execution", "system_health", {"run_id": "VALENCE_DEMO", "metrics_processed": 6, "status": "success"}, "VALENCE_RET007"),
         ],
-        "demo-eu-fintech": [
-            ("metric_snapshot", "continuous_monitoring", {"metric_id": "KRI-MTTD-001", "value": 3.4, "rag_status": "Green"}, "VALENCE_FIN001"),
-            ("compliance_check", "audit_evidence", {"framework": "NIS2", "control": "Art.21", "status": "Compliant"}, "VALENCE_FIN002"),
-            ("report_generated", "audit_trail", {"report_id": "RPT_ECB_Q1", "type": "pdf"}, "VALENCE_FIN003"),
+        "demo-eu-fintech": _common_metric_evidence + [
+            ("compliance_check", "audit_evidence", {"framework": "NIS2", "control_id": "NIS2-Art21", "title": "Incident Detection", "status": "Compliant"}, "VALENCE_FIN002"),
+            ("compliance_check", "audit_evidence", {"framework": "DORA", "control_id": "DORA-ICT-2.1", "title": "ICT Risk Management Framework", "status": "Compliant"}, "VALENCE_FIN003"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC6.1", "title": "Logical Access Controls", "status": "Compliant"}, "VALENCE_FIN004"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC7.3", "title": "Incident Response", "status": "Compliant"}, "VALENCE_FIN005"),
+            ("compliance_check", "audit_evidence", {"framework": "ISO27001", "control_id": "ISO-A.8.8", "title": "Technical vulnerabilities", "status": "Compliant"}, "VALENCE_FIN006"),
+            ("report_generated", "audit_trail", {"report_id": "RPT_ECB_Q1", "type": "pdf", "control_id": "DORA-ICT-2.1"}, "VALENCE_FIN007"),
+            ("pipeline_execution", "system_health", {"run_id": "VALENCE_DEMO", "metrics_processed": 6, "status": "success"}, "VALENCE_FIN008"),
         ],
-        "demo-healthcare": [
-            ("metric_snapshot", "continuous_monitoring", {"metric_id": "KPI-PHI-001", "value": 76.4, "rag_status": "Red"}, "VALENCE_HC001"),
-            ("compliance_check", "audit_evidence", {"framework": "HIPAA", "control": "§164.308(a)(3)", "status": "Non-Compliant"}, "VALENCE_HC002"),
-            ("access_review", "governance", {"stale_accounts": 847, "scope": "clinical"}, "VALENCE_HC003"),
+        "demo-healthcare": _common_metric_evidence + [
+            ("compliance_check", "audit_evidence", {"framework": "HIPAA", "control_id": "HIPAA-164.308(a)(6)", "title": "Security Incident Procedures", "status": "At Risk"}, "VALENCE_HC002"),
+            ("compliance_check", "audit_evidence", {"framework": "HIPAA", "control_id": "HIPAA-164.312(a)(1)", "title": "Access Control", "status": "Non-Compliant"}, "VALENCE_HC003"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC6.1", "title": "Logical Access Controls", "status": "Non-Compliant"}, "VALENCE_HC004"),
+            ("compliance_check", "audit_evidence", {"framework": "SOC2", "control_id": "SOC2-CC7.2", "title": "Vulnerability Management", "status": "Non-Compliant"}, "VALENCE_HC005"),
+            ("access_review", "governance", {"control_id": "HIPAA-164.312(a)(1)", "stale_accounts": 847, "scope": "clinical", "status": "Non-Compliant"}, "VALENCE_HC006"),
+            ("pipeline_execution", "system_health", {"run_id": "VALENCE_DEMO", "metrics_processed": 6, "status": "success"}, "VALENCE_HC007"),
         ],
     }
     return [
         {"event_type": e[0], "category": e[1], "data": e[2], "run_id": e[3]}
         for e in base_events.get(tenant_id, base_events["demo-global-hq"])
     ]
+
+
+def demo_remediation_seed(tenant_id: str) -> list[dict[str, Any]]:
+    """Pre-built remediation tasks per demo tenant so the board is never empty."""
+    now = datetime.now(UTC)
+    _tasks: dict[str, list[dict[str, Any]]] = {
+        "demo-global-hq": [
+            {"title": "Remediate DORA ICT-2.6: Response and Recovery SLA breach",
+             "description": "MTTR of 48.7 min exceeds 30-min SLA. Add auto-enrichment to Tier-1 IR playbooks and deploy SOAR handoff automation.",
+             "owner": "admin", "priority": "critical", "framework": "DORA", "control_id": "DORA-ICT-2.6",
+             "due_date": (now + timedelta(hours=48)).isoformat(), "sla_hours": 48, "status": "open"},
+            {"title": "Patch 8 critical CVEs on DMZ assets (DORA Art. 6)",
+             "description": "CVE-2024-3400, CVE-2024-21762 and 6 others remain unpatched >7 days on edge firewalls. Emergency change window required.",
+             "owner": "admin", "priority": "critical", "framework": "DORA", "control_id": "DORA-ICT-2.2",
+             "due_date": (now + timedelta(hours=24)).isoformat(), "sla_hours": 24, "status": "open"},
+            {"title": "Tune Elastic ICS rules to reduce OT MTTD degradation",
+             "description": "MTTD degraded 12% WoW after OT sensor rollout. Sigma rule tuning for ICS protocol anomalies needed.",
+             "owner": "admin", "priority": "high", "framework": "SOC2", "control_id": "SOC2-CC7.3",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "in_progress"},
+            {"title": "Deprovision 3 stale service accounts from PAM review",
+             "description": "Quarterly privileged access attestation flagged 3 stale service accounts. Deprovisioning required per SOC2-CC6.3.",
+             "owner": "admin", "priority": "medium", "framework": "SOC2", "control_id": "SOC2-CC6.3",
+             "due_date": (now + timedelta(hours=168)).isoformat(), "sla_hours": 168, "status": "open"},
+            {"title": "Investigate GitHub exfiltration attempts (DLP-001)",
+             "description": "Engineering GitHub exfil attempts up 22%. Insider threat review FIND-2024-017 opened. Review DLP egress policies.",
+             "owner": "admin", "priority": "high", "framework": "ISO27001", "control_id": "ISO-A.8.12",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "open"},
+        ],
+        "demo-us-retail": [
+            {"title": "Emergency patch CVE-2024-3400 on edge firewalls",
+             "description": "Change freeze delayed emergency patch window. PCI-DSS Req 6.2 non-compliant until patched.",
+             "owner": "admin", "priority": "critical", "framework": "PCI_DSS", "control_id": "PCI-6.2",
+             "due_date": (now + timedelta(hours=24)).isoformat(), "sla_hours": 24, "status": "open"},
+            {"title": "Remediate store manager shared credentials (19% of locations)",
+             "description": "PAM Phase 2 rollout overdue. 19% of store locations using shared manager credentials.",
+             "owner": "admin", "priority": "critical", "framework": "SOC2", "control_id": "SOC2-CC6.1",
+             "due_date": (now + timedelta(hours=48)).isoformat(), "sla_hours": 48, "status": "open"},
+            {"title": "Resize Splunk HEC buffer for Black Friday volume",
+             "description": "Store POS log forwarding latency 18 min avg. HEC buffer undersized causing MTTD regression.",
+             "owner": "admin", "priority": "high", "framework": "SOC2", "control_id": "SOC2-CC7.1",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "in_progress"},
+            {"title": "Block personal cloud storage DLP egress",
+             "description": "74 customer PII egress events via personal cloud storage this month (vs 41 prior).",
+             "owner": "admin", "priority": "high", "framework": "SOC2", "control_id": "SOC2-CC6.6",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "open"},
+            {"title": "Address L1 SOC alert fatigue — 28% FPR",
+             "description": "False positive rate 28% vs 15% industry median. Sigma rule tuning and ML feedback loop needed.",
+             "owner": "admin", "priority": "medium", "framework": "SOC2", "control_id": "SOC2-CC7.5",
+             "due_date": (now + timedelta(hours=168)).isoformat(), "sla_hours": 168, "status": "open"},
+        ],
+        "demo-eu-fintech": [
+            {"title": "Update SOAR playbook for PSD2 SCA edge cases",
+             "description": "Strong Customer Authentication flow audit found 2 edge cases not covered by current SOAR playbooks.",
+             "owner": "admin", "priority": "medium", "framework": "DORA", "control_id": "DORA-ICT-2.6",
+             "due_date": (now + timedelta(hours=168)).isoformat(), "sla_hours": 168, "status": "in_progress"},
+            {"title": "Renew ECB audit attestation — Q2 preparation",
+             "description": "ECB quarterly audit Q2 2025 preparation. Evidence pack generation and review.",
+             "owner": "admin", "priority": "low", "framework": "DORA", "control_id": "DORA-ICT-2.1",
+             "due_date": (now + timedelta(days=30)).isoformat(), "sla_hours": 720, "status": "open"},
+            {"title": "Completed: ML classifier FPR reduction to 8.4%",
+             "description": "Custom ML classifier reduced FPR from 14% to 8.4% over 6 months. Closing task.",
+             "owner": "admin", "priority": "medium", "framework": "NIS2", "control_id": "NIS2-Art21",
+             "due_date": (now - timedelta(days=5)).isoformat(), "sla_hours": 720, "status": "completed"},
+        ],
+        "demo-healthcare": [
+            {"title": "Remediate 847 stale clinical accounts (HIPAA §164.308)",
+             "description": "Privileged access review at 76% — below 90% board mandate. 847 stale clinical accounts require deprovisioning.",
+             "owner": "admin", "priority": "critical", "framework": "HIPAA", "control_id": "HIPAA-164.312(a)(1)",
+             "due_date": (now + timedelta(hours=48)).isoformat(), "sla_hours": 48, "status": "open"},
+            {"title": "Patch 14 critical medical IoT CVEs",
+             "description": "FDA-regulated imaging systems on extended patch cycle. Coordinate with vendor for emergency maintenance window.",
+             "owner": "admin", "priority": "critical", "framework": "HIPAA", "control_id": "HIPAA-164.308(a)(5)",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "open"},
+            {"title": "Complete medical IoT VLAN log coverage",
+             "description": "Device logs incomplete on 12% of VLANs. Ransomware tabletop exposed detection gaps on imaging subnets.",
+             "owner": "admin", "priority": "high", "framework": "HIPAA", "control_id": "HIPAA-164.312(b)",
+             "due_date": (now + timedelta(hours=72)).isoformat(), "sla_hours": 72, "status": "in_progress"},
+            {"title": "Tune Epic EHR integration alert baseline",
+             "description": "EHR integration generates high baseline noise (22.6% FPR). Work with Epic vendor on event filtering.",
+             "owner": "admin", "priority": "medium", "framework": "SOC2", "control_id": "SOC2-CC7.1",
+             "due_date": (now + timedelta(hours=168)).isoformat(), "sla_hours": 168, "status": "open"},
+            {"title": "Review ePHI email misdelivery controls",
+             "description": "ePHI email misdelivery incidents stable at 29/month but above peer median for regional health systems.",
+             "owner": "admin", "priority": "medium", "framework": "HIPAA", "control_id": "HIPAA-164.312(e)(1)",
+             "due_date": (now + timedelta(hours=168)).isoformat(), "sla_hours": 168, "status": "open"},
+        ],
+    }
+    return _tasks.get(tenant_id, _tasks["demo-global-hq"])
 
 
 def demo_timeline_snapshots(tenant_id: str, days: int = 90) -> list[dict[str, Any]]:

@@ -41,12 +41,15 @@ class VendorCreate(BaseModel):
 async def _ensure_demo_vendors(session: AsyncSession, tenant_id: str) -> None:
     if not is_demo_tenant(tenant_id):
         return
-    existing = await session.execute(
-        select(VendorRecord.id).where(VendorRecord.tenant_id == tenant_id).limit(1)
-    )
-    if existing.scalar_one_or_none():
-        return
     for v in DEMO_VENDORS:
+        existing = await session.execute(
+            select(VendorRecord.id).where(
+                VendorRecord.tenant_id == tenant_id,
+                VendorRecord.name == v["name"]
+            ).limit(1)
+        )
+        if existing.scalar_one_or_none():
+            continue
         scored = score_vendor(
             v["questionnaire_score"],
             v["data_classification"],

@@ -1,0 +1,511 @@
+/* ─── VALENCE Enterprise API Documentation Theme (Light Cream & Emerald) ─────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap');
+
+:root {
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F1F5F9;
+  --bg-mint: #ECFDF5;
+  --border-light: #E2E8F0;
+  --border-mint: #A7F3D0;
+  --border-strong: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --emerald-main: #10B981;
+  --emerald-dark: #047857;
+  --emerald-light: #ECFDF5;
+  --font-sans: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body, html {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.swagger-ui {
+  font-family: var(--font-sans) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Fixed Top Header */
+.valence-api-header {
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border-light);
+  padding: 14px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.valence-api-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.3px;
+}
+
+.valence-api-brand-logo {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.valence-api-badge {
+  background: var(--bg-mint);
+  border: 1px solid var(--border-mint);
+  color: var(--emerald-dark);
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+}
+
+.valence-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.valence-nav-pill {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  font-size: 0.825rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.valence-nav-pill:hover {
+  background: var(--bg-mint);
+  border-color: var(--border-mint);
+  color: var(--emerald-dark);
+  transform: translateY(-1px);
+}
+
+/* Misuse Prevention & Security Banner */
+.valence-security-banner {
+  max-width: 1400px;
+  margin: 28px auto 0 auto;
+  padding: 0 24px;
+}
+
+.security-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-mint);
+  border-left: 5px solid var(--emerald-main);
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.06);
+}
+
+.security-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.security-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.security-rule {
+  background: var(--bg-mint);
+  border: 1px solid var(--border-mint);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.security-rule-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--emerald-dark);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.security-rule-desc {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Category Filter Tabs */
+.valence-filter-bar {
+  max-width: 1400px;
+  margin: 20px auto 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filter-chip {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.filter-chip:hover, .filter-chip.active {
+  background: var(--emerald-main);
+  border-color: var(--emerald-main);
+  color: #FFFFFF;
+}
+
+/* Hide default swagger topbar */
+.swagger-ui .topbar {
+  display: none !important;
+}
+
+/* Container spacing */
+.swagger-ui .wrapper {
+  max-width: 1400px !important;
+  padding: 0 24px !important;
+}
+
+/* Info Header Section */
+.swagger-ui .info {
+  margin: 20px 0 24px 0 !important;
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 14px !important;
+  padding: 24px 30px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.02) !important;
+}
+
+.swagger-ui .info .title {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+}
+
+.swagger-ui .info p, .swagger-ui .info li {
+  color: var(--text-secondary) !important;
+  font-size: 0.925rem !important;
+  line-height: 1.6 !important;
+}
+
+/* Authorize Button & Container */
+.swagger-ui .scheme-container {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 12px !important;
+  padding: 14px 24px !important;
+  box-shadow: none !important;
+  margin-bottom: 24px !important;
+}
+
+.swagger-ui .btn.authorize {
+  background: var(--emerald-main) !important;
+  border: 1px solid var(--emerald-dark) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  padding: 8px 22px !important;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25) !important;
+  transition: all 0.15s ease !important;
+}
+
+.swagger-ui .btn.authorize:hover {
+  background: #16A34A !important;
+  transform: translateY(-1px);
+}
+
+.swagger-ui .btn.authorize svg {
+  fill: #FFFFFF !important;
+}
+
+/* Tag Headers (Category Blocks) */
+.swagger-ui .opblock-tag-section {
+  margin-bottom: 20px !important;
+}
+
+.swagger-ui .opblock-tag {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--border-light) !important;
+  padding: 10px 0 !important;
+}
+
+.swagger-ui .opblock-tag small {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+}
+
+/* Opblocks (Endpoints Cards) */
+.swagger-ui .opblock {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+  margin: 0 0 10px 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.swagger-ui .opblock:hover {
+  border-color: var(--border-strong) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  padding: 10px 16px !important;
+  border-radius: 10px !important;
+}
+
+/* Method Badges */
+.swagger-ui .opblock .opblock-summary-method {
+  border-radius: 6px !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  min-width: 75px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  padding: 5px 10px !important;
+}
+
+/* GET - Soft Emerald Mint */
+.swagger-ui .opblock.opblock-get {
+  border-color: #BBF7D0 !important;
+}
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+  background: #ECFDF5 !important;
+  color: #047857 !important;
+  border: 1px solid #A7F3D0 !important;
+}
+
+/* POST - Soft Blue */
+.swagger-ui .opblock.opblock-post {
+  border-color: #BFDBFE !important;
+}
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+  background: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border: 1px solid #93C5FD !important;
+}
+
+/* PUT / PATCH - Soft Amber */
+.swagger-ui .opblock.opblock-put, .swagger-ui .opblock.opblock-patch {
+  border-color: #FDE68A !important;
+}
+.swagger-ui .opblock.opblock-put .opblock-summary-method,
+.swagger-ui .opblock.opblock-patch .opblock-summary-method {
+  background: #FFFBEB !important;
+  color: #B45309 !important;
+  border: 1px solid #FCD34D !important;
+}
+
+/* DELETE - Soft Rose */
+.swagger-ui .opblock.opblock-delete {
+  border-color: #FECDD3 !important;
+}
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+  background: #FFF1F2 !important;
+  color: #BE123C !important;
+  border: 1px solid #FDA4AF !important;
+}
+
+.swagger-ui .opblock .opblock-summary-path {
+  color: #0F172A !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
+.swagger-ui .opblock .opblock-summary-description {
+  color: var(--text-secondary) !important;
+  font-size: 0.85rem !important;
+}
+
+/* Opblock Body (Expanded Endpoint) */
+.swagger-ui .opblock-body {
+  background: #FAF9F5 !important;
+  border-top: 1px solid var(--border-light) !important;
+  padding: 18px !important;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.swagger-ui .opblock-section-header {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 6px !important;
+  padding: 6px 14px !important;
+}
+
+.swagger-ui .opblock-section-header h4 {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+.swagger-ui table thead tr th {
+  color: var(--text-muted) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+}
+
+.swagger-ui table tbody tr td {
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}
+
+.swagger-ui .parameter__name {
+  font-family: var(--font-mono) !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+.swagger-ui .parameter__type {
+  font-family: var(--font-mono) !important;
+  color: var(--emerald-dark) !important;
+}
+
+/* Inputs & Textareas */
+.swagger-ui input[type=text],
+.swagger-ui input[type=password],
+.swagger-ui select,
+.swagger-ui textarea {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-strong) !important;
+  color: #0F172A !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+}
+
+.swagger-ui input[type=text]:focus,
+.swagger-ui select:focus,
+.swagger-ui textarea:focus {
+  border-color: var(--emerald-main) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+}
+
+/* Try it out & Execute Buttons */
+.swagger-ui .btn.try-out__btn {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text-secondary) !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+.swagger-ui .btn.execute {
+  background: var(--emerald-main) !important;
+  border: 1px solid var(--emerald-dark) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* Code Response Blocks */
+.swagger-ui .highlight-code pre,
+.swagger-ui .microlight {
+  background: #0F172A !important;
+  border: 1px solid #1E293B !important;
+  border-radius: 8px !important;
+  color: #4ADE80 !important;
+  font-family: var(--font-mono) !important;
+  padding: 14px !important;
+}
+
+/* Auth Modal */
+.swagger-ui .dialog-ux .modal-ux {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header {
+  border-bottom: 1px solid var(--border-light) !important;
+  padding: 16px 24px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header h3 {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+/* Models / Schemas Section */
+.swagger-ui section.models {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 14px !important;
+  padding: 24px !important;
+  margin-top: 28px !important;
+}
+
+.swagger-ui section.models h4 {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 1.2rem !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  padding-bottom: 10px !important;
+}
+
+.swagger-ui .model-title {
+  color: var(--emerald-dark) !important;
+  font-family: var(--font-mono) !important;
+}

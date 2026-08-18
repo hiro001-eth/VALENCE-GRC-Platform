@@ -42,14 +42,14 @@ INVESTMENT_MODELS = {
     "KRI-DLP-001":  {"cost_per_pct": 10000, "label": "DLP agent deployment / policy tuning", "max_improvement": 75},
 }
 
-# RAG thresholds per metric (value ranges for Green/Amber/Red)
+# RAG thresholds per metric — aligned with rules/threshold_config.yaml
 RAG_THRESHOLDS = {
-    "KRI-MTTD-001": {"green_max": 10, "amber_max": 20, "unit": "minutes", "lower_is_better": True},
-    "KRI-MTTR-001": {"green_max": 30, "amber_max": 60, "unit": "minutes", "lower_is_better": True},
+    "KRI-MTTD-001": {"green_max": 2, "amber_max": 4, "unit": "hours", "lower_is_better": True},
+    "KRI-MTTR-001": {"green_max": 24, "amber_max": 48, "unit": "hours", "lower_is_better": True},
     "KPI-FPR-001":  {"green_max": 25, "amber_max": 40, "unit": "%", "lower_is_better": True},
     "KRI-CVE-001":  {"green_max": 3, "amber_max": 7, "unit": "days", "lower_is_better": True},
-    "KPI-PHI-001":  {"green_max": 100, "amber_max": 85, "unit": "%", "lower_is_better": False},
-    "KRI-DLP-001":  {"green_max": 15, "amber_max": 30, "unit": "incidents", "lower_is_better": True},
+    "KPI-PHI-001":  {"green_max": 100, "amber_max": 90, "unit": "%", "lower_is_better": False},
+    "KRI-DLP-001":  {"green_max": 15, "amber_max": 50, "unit": "incidents", "lower_is_better": True},
 }
 
 
@@ -86,6 +86,7 @@ def _monte_carlo_var(value: float, metric_id: str, runs: int = 1000) -> dict[str
         "ale_usd": round(sum(losses) / len(losses)),
         "var_95_usd": round(losses[int(len(losses) * 0.95)]),
         "probability_of_breach": round(min(1.0, len([l for l in losses if l > 500000]) / len(losses)), 3),
+        "curve": [round(l) for l in losses],
     }
 
 
@@ -135,6 +136,7 @@ async def simulate_whatif(
             "ale_usd": mc["ale_usd"],
             "var_95_usd": mc["var_95_usd"],
             "probability_of_breach": mc["probability_of_breach"],
+            "curve": mc["curve"],
             "is_modified": True,
         }
         projected_metrics.append(projected)
@@ -160,9 +162,9 @@ async def simulate_whatif(
     modified_ids = {s.metric_id for s in body.scenarios}
     for m in metrics:
         if m["metric_id"] not in modified_ids:
-            projected_metrics.append({**m, "is_modified": False})
+            mc_orig = _monte_carlo_var(m.get("value", 0), m["metric_id"], body.simulation_runs)
+            projected_metrics.append({**m, "curve": mc_orig["curve"], "is_modified": False})
 
-    # Calculate totals
     original_total_var = sum(m.get("var_95_usd", 0) for m in metrics)
     original_total_ale = sum(m.get("ale_usd", 0) for m in metrics)
     projected_total_var = sum(m.get("var_95_usd", 0) for m in projected_metrics)
@@ -170,11 +172,30 @@ async def simulate_whatif(
 
     roi = (original_total_var - projected_total_var) / max(1, total_investment) if total_investment > 0 else 0
 
+    # Build portfolio curves
+    orig_portfolio_curve = [0] * body.simulation_runs
+    proj_portfolio_curve = [0] * body.simulation_runs
+    
+    for m in metrics:
+        mc_o = _monte_carlo_var(m.get("value", 0), m["metric_id"], body.simulation_runs)
+        for i in range(body.simulation_runs):
+            orig_portfolio_curve[i] += mc_o["curve"][i]
+            
+    for m in projected_metrics:
+        for i in range(body.simulation_runs):
+            proj_portfolio_curve[i] += m.get("curve", [0]*body.simulation_runs)[i]
+
+    # Clean up curve data from individual metrics before returning to avoid massive payload size
+    for m in projected_metrics:
+        m.pop("curve", None)
+
     return {
         "simulation": {
             "runs": body.simulation_runs,
             "scenarios_applied": len(changes),
             "total_investment_usd": total_investment,
+            "original_loss_curve": orig_portfolio_curve,
+            "projected_loss_curve": proj_portfolio_curve,
         },
         "current_portfolio": {
             "total_var_95_usd": original_total_var,

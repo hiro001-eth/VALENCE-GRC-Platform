@@ -1,8 +1,6 @@
 """ITSM ticket sync and CMDB — ServiceNow + Jira parity."""
 from __future__ import annotations
 
-import uuid
-from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -12,9 +10,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from grc_dashboard.api.tenant_context import get_tenant_id
 from grc_dashboard.auth.dependencies import RequireAdmin, RequireAnalyst
-from grc_dashboard.db.models import CmdbAsset, IntegrationSettings, ItsTicketRecord, RemediationTask, User
+from grc_dashboard.db.models import (
+    CmdbAsset,
+    IntegrationSettings,
+    ItsTicketRecord,
+    RemediationTask,
+    User,
+)
 from grc_dashboard.db.session import get_db
-from grc_dashboard.orchestration.itsm_sync import sync_cmdb_from_integrations, sync_remediation_to_itsm
+from grc_dashboard.orchestration.itsm_sync import (
+    sync_cmdb_from_integrations,
+    sync_remediation_to_itsm,
+)
 
 router = APIRouter()
 

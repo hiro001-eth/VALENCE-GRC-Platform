@@ -8,8 +8,11 @@ from typing import Any
 
 import structlog
 
-from grc_dashboard.pipeline.tenant_runner import discover_production_tenant_ids, run_pipeline_for_tenant_safe
-from grc_dashboard.tenancy.constants import DEMO_TENANT_IDS, is_demo_tenant
+from grc_dashboard.pipeline.tenant_runner import (
+    discover_production_tenant_ids,
+    run_pipeline_for_tenant_safe,
+)
+from grc_dashboard.tenancy.constants import DEMO_TENANT_IDS
 from grc_dashboard.tenancy.demo_scenarios import build_tenant_metrics
 
 logger = structlog.get_logger(__name__)

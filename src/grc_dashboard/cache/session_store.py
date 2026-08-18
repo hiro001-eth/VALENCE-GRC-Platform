@@ -11,6 +11,8 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 REDIS_URL = os.getenv("REDIS_URL", "").strip()
+_MAX_MEMORY_ENTRIES = 10_000  # Prevent memory exhaustion when Redis is unavailable
+_MAX_REVOKED_TOKENS = 50_000
 _memory: dict[str, tuple[str, float]] = {}
 _revoked_tokens: dict[str, float] = {}
 _redis_client: Any = None
@@ -126,6 +128,12 @@ def _purge_memory() -> None:
     expired = [k for k, (_, exp) in _memory.items() if exp <= now]
     for key in expired:
         _memory.pop(key, None)
+    # LRU eviction if still over cap
+    if len(_memory) > _MAX_MEMORY_ENTRIES:
+        # Sort by expiry, remove oldest first
+        sorted_keys = sorted(_memory, key=lambda k: _memory[k][1])
+        for key in sorted_keys[: len(_memory) - _MAX_MEMORY_ENTRIES]:
+            _memory.pop(key, None)
 
 
 def _purge_revoked() -> None:
@@ -133,3 +141,8 @@ def _purge_revoked() -> None:
     expired = [k for k, exp in _revoked_tokens.items() if exp <= now]
     for key in expired:
         _revoked_tokens.pop(key, None)
+    # LRU eviction if over cap
+    if len(_revoked_tokens) > _MAX_REVOKED_TOKENS:
+        sorted_keys = sorted(_revoked_tokens, key=lambda k: _revoked_tokens[k])
+        for key in sorted_keys[: len(_revoked_tokens) - _MAX_REVOKED_TOKENS]:
+            _revoked_tokens.pop(key, None)

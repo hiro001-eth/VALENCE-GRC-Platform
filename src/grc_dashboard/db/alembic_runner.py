@@ -1,12 +1,12 @@
 """Run Alembic migrations programmatically (Postgres production path)."""
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import structlog
-from alembic import command
 from alembic.config import Config
+
+from alembic import command
 
 logger = structlog.get_logger(__name__)
 
@@ -25,7 +25,8 @@ def run_alembic_upgrade(revision: str = "head") -> None:
     """Apply pending Alembic revisions."""
     root = Path(__file__).resolve().parents[3]
     cfg = Config(str(root / "alembic.ini"))
-    db_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./valence.db")
+    from grc_dashboard.config import resolve_database_url
+    db_url = resolve_database_url()
     cfg.set_main_option("sqlalchemy.url", _sync_database_url(db_url))
     command.upgrade(cfg, revision)
     logger.info("alembic_upgrade_complete", revision=revision)

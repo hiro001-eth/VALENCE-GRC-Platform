@@ -13,7 +13,24 @@ is_valence_pid() {
   local pid="$1"
   local cmd
   cmd=$(ps -p "$pid" -o args= 2>/dev/null || true)
-  [[ "$cmd" == *"valence-api"* ]] || [[ "$cmd" == *"grc_dashboard.api.main"* ]]
+  if [[ "$cmd" == *"valence-api"* ]] || [[ "$cmd" == *"grc_dashboard.api.main"* ]]; then
+    return 0
+  fi
+
+  # Uvicorn reload workers can inherit the listening socket but appear as
+  # generic multiprocessing children. Walk the parent chain so we still
+  # recognize them as part of this app before deciding the port is foreign.
+  local parent
+  parent=$(ps -p "$pid" -o ppid= 2>/dev/null | tr -d '[:space:]')
+  while [[ -n "$parent" && "$parent" != "0" && "$parent" != "1" ]]; do
+    cmd=$(ps -p "$parent" -o args= 2>/dev/null || true)
+    if [[ "$cmd" == *"valence-api"* ]] || [[ "$cmd" == *"grc_dashboard.api.main"* ]]; then
+      return 0
+    fi
+    parent=$(ps -p "$parent" -o ppid= 2>/dev/null | tr -d '[:space:]')
+  done
+
+  return 1
 }
 
 port_listener_pids() {
@@ -54,13 +71,13 @@ ensure_port_available() {
   fi
 
   # Free port from any other VALENCE instance; fail if a foreign process holds it.
+  local listeners
+  listeners="$(port_listener_pids)"
+
   local pid
-  for pid in $(port_listener_pids); do
+  for pid in $listeners; do
     [ -n "$pid" ] || continue
-    if is_valence_pid "$pid"; then
-      echo "Freeing port $VALENCE_PORT (stopping stale VALENCE PID $pid)..."
-      stop_pid_gracefully "$pid"
-    else
+    if ! is_valence_pid "$pid"; then
       local cmd
       cmd=$(ps -p "$pid" -o args= 2>/dev/null || echo "unknown")
       echo "ERROR: Port $VALENCE_PORT is already in use by another program (PID $pid):"
@@ -70,6 +87,12 @@ ensure_port_available() {
       echo "  VALENCE_PORT=8001 ./run.sh"
       exit 1
     fi
+  done
+
+  for pid in $listeners; do
+    [ -n "$pid" ] || continue
+    echo "Freeing port $VALENCE_PORT (stopping stale VALENCE PID $pid)..."
+    stop_pid_gracefully "$pid"
   done
 
   local i
@@ -97,5 +120,6 @@ if [ ! -f "./.venv/bin/valence-api" ]; then
   exit 1
 fi
 
+export VALENCE_RELOAD="${VALENCE_RELOAD:-true}"
 ensure_port_available
 exec ./.venv/bin/valence-api
